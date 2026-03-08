@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "scripts": {
+    "seed": "tsx seed/index.ts"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
@@ -13,6 +16,8 @@
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.9"
+    "dotenv": "^17.3.1",
+    "drizzle-kit": "^0.31.9",
+    "tsx": "^4"
   }
 }

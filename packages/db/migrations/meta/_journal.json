@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1772963512300,
+      "tag": "0000_20260308185150_create_tasks",
+      "breakpoints": true
+    }
+  ]
+}
