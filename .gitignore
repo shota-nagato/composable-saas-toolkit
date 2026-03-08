@@ -1,2 +1,17 @@
 node_modules/
 docs/memo/
+
+# Turborepo
+.turbo/
+
+# Cloudflare Workers
+.wrangler/
+.dev.vars
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
