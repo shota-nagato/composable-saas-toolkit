@@ -7,7 +7,9 @@ const app = factory.createApp()
 
 app.use('*', singleTenantMiddleware())
 
-app.route('/api/tasks', taskRoutes)
-app.route('/api/workflow-states', workflowStateRoutes)
+const routes = app
+  .route('/api/tasks', taskRoutes)
+  .route('/api/workflow-states', workflowStateRoutes)
 
-export default app
+export default routes
+export type AppType = typeof routes
