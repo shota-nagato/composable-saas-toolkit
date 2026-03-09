@@ -40,13 +40,7 @@ const app = factory
     const id = c.req.param('id')
     const body = c.req.valid('json')
 
-    await db
-      .update(tasks)
-      .set({
-        ...body,
-        updatedAt: new Date().toISOString(),
-      })
-      .where(eq(tasks.id, id))
+    await db.update(tasks).set(body).where(eq(tasks.id, id))
 
     const [updated] = await db.select().from(tasks).where(eq(tasks.id, id))
     if (!updated) throw new HTTPException(404, { message: 'Task not found' })
