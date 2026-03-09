@@ -1,6 +1,7 @@
 import { zValidator } from '@hono/zod-validator'
 import { tasks } from '@toolkit/db'
 import { eq } from 'drizzle-orm'
+import { HTTPException } from 'hono/http-exception'
 import { factory } from '../factory'
 import { createTaskSchema, updateTaskSchema } from '../schemas/tasks'
 
@@ -31,7 +32,7 @@ const app = factory
     const id = c.req.param('id')
     const [task] = await db.select().from(tasks).where(eq(tasks.id, id))
 
-    if (!task) return c.json({ error: 'Task not found' }, 404)
+    if (!task) throw new HTTPException(404, { message: 'Task not found' })
     return c.json(task)
   })
   .patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
@@ -48,7 +49,7 @@ const app = factory
       .where(eq(tasks.id, id))
 
     const [updated] = await db.select().from(tasks).where(eq(tasks.id, id))
-    if (!updated) return c.json({ error: 'Task not found' }, 404)
+    if (!updated) throw new HTTPException(404, { message: 'Task not found' })
     return c.json(updated)
   })
   .delete('/:id', async (c) => {
