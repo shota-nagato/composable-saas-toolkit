@@ -1,3 +1,4 @@
+catalogMode: strict
 packages:
   - apps/*
   - modules/*
@@ -11,5 +12,5 @@ catalog:
   '@libsql/client': ^0.17.0
   better-auth: ^1.4.12
   drizzle-orm: ^0.45.1
-  hono: 4.12.5
+  hono: ^4.12.5
   zod: ^4.3.6
