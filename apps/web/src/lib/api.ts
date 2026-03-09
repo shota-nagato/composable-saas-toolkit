@@ -2,7 +2,8 @@ import type { AppType } from '@toolkit/tasks'
 import type { InferRequestType, InferResponseType } from 'hono/client'
 import { hc } from 'hono/client'
 
-export const client = hc<AppType>('/')
+const baseUrl = import.meta.env.VITE_API_URL ?? '/'
+export const client = hc<AppType>(baseUrl)
 
 type TasksGetEndpoint = typeof client.api.tasks.$get
 type TasksPostEndpoint = typeof client.api.tasks.$post

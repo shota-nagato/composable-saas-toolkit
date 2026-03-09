@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { parseResponse } from 'hono/client'
+import { DetailedError, parseResponse } from 'hono/client'
 import { type CreateTaskInput, client, type UpdateTaskInput } from '../lib/api'
 
 export const taskKeys = {
@@ -30,6 +30,7 @@ export function useCreateTask() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: taskKeys.all })
     },
+    onError: handleMutationError,
   })
 }
 
@@ -43,6 +44,7 @@ export function useUpdateTask() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: taskKeys.all })
     },
+    onError: handleMutationError,
   })
 }
 
@@ -55,5 +57,14 @@ export function useDeleteTask() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: taskKeys.all })
     },
+    onError: handleMutationError,
   })
+}
+
+function handleMutationError(error: Error) {
+  if (error instanceof DetailedError) {
+    console.error(`[API ${error.statusCode}]`, error.message, error.detail)
+    return
+  }
+  console.error('[API]', error.message)
 }
