@@ -1,5 +1,31 @@
+export type { BadgeProps } from './components/badge'
+export { Badge } from './components/badge'
 export type { ButtonProps } from './components/button'
 export { Button } from './components/button'
+
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './components/dialog'
+
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from './components/dropdown-menu'
 export type { InputProps } from './components/input'
 export { Input } from './components/input'
 export type { LabelProps } from './components/label'

@@ -11,12 +11,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "catalog:",
     "@tanstack/react-query": "^5.90.21",
     "@toolkit/tasks": "workspace:*",
     "@toolkit/ui": "workspace:*",
     "hono": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-hook-form": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -33,6 +36,7 @@
     "tailwindcss": "^4.2.1",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vite-plugin-svgr": "catalog:"
   }
 }

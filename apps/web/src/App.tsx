@@ -1,17 +1,22 @@
 import { Button } from '@toolkit/ui'
 import { useState } from 'react'
 import { TaskCreateForm } from './features/tasks/TaskCreateForm'
+import { TaskItem } from './features/tasks/TaskItem'
 import { useTasks } from './hooks/useTasks'
+import { useWorkflowStates } from './hooks/useWorkflowStates'
 
 function App() {
-  const { data: tasks, isLoading } = useTasks()
+  const { data: tasks, isLoading: tasksLoading } = useTasks()
+  const { data: workflowStates, isLoading: statesLoading } = useWorkflowStates()
   const [showForm, setShowForm] = useState(false)
 
-  if (isLoading) return <p className="p-4 text-muted">Loading...</p>
+  if (tasksLoading || statesLoading) {
+    return <p className="p-6 text-muted">Loading...</p>
+  }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="mx-auto max-w-2xl p-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-foreground">Tasks</h1>
         {!showForm && (
           <Button size="sm" onClick={() => setShowForm(true)}>
@@ -31,15 +36,14 @@ function App() {
 
       <ul className="space-y-2">
         {tasks?.map((task) => (
-          <li
+          <TaskItem
             key={task.id}
-            className="px-4 py-3 border border-border rounded-lg text-foreground bg-surface hover:bg-surface-hover transition-colors"
-          >
-            {task.title}
-          </li>
+            task={task}
+            workflowStates={workflowStates ?? []}
+          />
         ))}
         {tasks?.length === 0 && (
-          <li className="text-center py-8 text-muted">No tasks yet</li>
+          <li className="py-8 text-center text-muted">No tasks yet</li>
         )}
       </ul>
     </div>
