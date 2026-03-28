@@ -23,3 +23,4 @@ const routes = app
 
 export default routes
 export type AppType = typeof routes
+export { createTaskSchema, updateTaskSchema } from './schemas/tasks'

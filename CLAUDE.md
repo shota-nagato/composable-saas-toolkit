@@ -134,6 +134,55 @@ Token categories: `primary`, `destructive`, `success`, `warning`, `foreground`, 
 
 ## Frontend Conventions (`apps/web`)
 
+### End-to-End Type Safety: Types vs Validation
+
+This project has two complementary systems. Keep their roles separate:
+
+```
+Backend (modules/tasks)
+  └─ Zod schemas     → Request validation + source of validation rules
+  └─ Hono routes     → AppType export (source of truth for types)
+
+Frontend (apps/web)
+  └─ Hono RPC (hc<AppType>)        → Type inference (SSOT for all API types)
+  └─ Zod schemas (from @toolkit/*)  → Form validation rules only
+```
+
+**Rules:**
+
+- **Types come from Hono RPC** — never hand-write API types, never use `z.infer` for form types:
+  ```ts
+  // GOOD: Type inferred from Hono RPC
+  import type { CreateTaskInput } from '../lib/api'
+  useForm<CreateTaskInput>({ resolver: zodResolver(createTaskSchema) })
+
+  // BAD: Type derived from Zod schema (duplicates Hono RPC)
+  type FormValues = z.infer<typeof createTaskSchema>
+  ```
+- **Validation rules come from Zod schemas** — shared between frontend and backend via exports from `modules/*`:
+  ```ts
+  // modules/tasks/src/index.ts exports both AppType and Zod schemas
+  export { createTaskSchema, updateTaskSchema } from './schemas/tasks'
+  ```
+- **`api.ts` is the single type registry** — all inferred types are defined and exported here:
+  ```ts
+  // apps/web/src/lib/api.ts
+  export type Task = InferResponseType<typeof client.api.tasks.$get>[number]
+  export type CreateTaskInput = InferRequestType<typeof client.api.tasks.$post>['json']
+  ```
+
+### Forms (react-hook-form)
+
+- `react-hook-form` + `@hookform/resolvers/zod` for all forms
+- Zod schema from backend for validation rules, Hono RPC type for form type:
+  ```ts
+  const { register, handleSubmit, control } = useForm<CreateTaskInput>({
+    resolver: zodResolver(createTaskSchema),
+  })
+  ```
+- `Controller` for non-native inputs (e.g., Radix Select)
+- `mode: 'onChange'` for real-time validation feedback
+
 ### TanStack Query Hooks
 
 - One file per resource: `hooks/useTasks.ts`, `hooks/useWorkflowStates.ts`
@@ -151,7 +200,7 @@ Token categories: `primary`, `destructive`, `success`, `warning`, `foreground`, 
 
 ```
 src/
-  lib/          → API client, utilities
+  lib/          → API client, type registry (api.ts)
   hooks/        → TanStack Query hooks (one per resource)
   features/     → Feature-specific components (e.g., features/tasks/)
   App.tsx       → Root page
@@ -286,6 +335,24 @@ npx drizzle-kit push                             # Push schema directly (dev onl
 - `noExplicitAny`: warn (avoid, but not blocked)
 - A11y rules: warn level (address, not blocking)
 - CSS/Tailwind: not linted by Biome (handled by Tailwind itself)
+
+### Tailwind CSS v4 Class Conventions
+
+- **Use Tailwind's built-in spacing scale** instead of arbitrary values:
+  ```tsx
+  // GOOD: Tailwind utility class
+  'w-45'          // 180px (45 * 4px)
+  'w-50'          // 200px (50 * 4px)
+  'gap-2.5'       // 10px
+  'p-4'           // 16px
+
+  // BAD: Arbitrary value when a utility exists
+  'w-[180px]'     // Use w-45 instead
+  'w-[200px]'     // Use w-50 instead
+  'gap-[10px]'    // Use gap-2.5 instead
+  ```
+- **Arbitrary values `[...]` are OK** only when no Tailwind utility exists (e.g., `min-w-[var(--radix-select-trigger-width)]`)
+- Reference: Tailwind v4 spacing = `value * 4px` (e.g., `w-45` = 180px, `w-50` = 200px)
 
 ## Adding a New Package
 

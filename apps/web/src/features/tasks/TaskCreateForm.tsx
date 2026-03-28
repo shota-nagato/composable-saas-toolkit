@@ -1,3 +1,5 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { createTaskSchema } from '@toolkit/tasks'
 import {
   Button,
   Input,
@@ -9,9 +11,10 @@ import {
   SelectValue,
   Textarea,
 } from '@toolkit/ui'
-import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useCreateTask } from '../../hooks/useTasks'
 import { useWorkflowStates } from '../../hooks/useWorkflowStates'
+import type { CreateTaskInput } from '../../lib/api'
 
 interface TaskCreateFormProps {
   onCancel: () => void
@@ -19,30 +22,34 @@ interface TaskCreateFormProps {
 }
 
 export function TaskCreateForm({ onCancel, onSuccess }: TaskCreateFormProps) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [stateId, setStateId] = useState('')
-
   const { data: workflowStates, isLoading: statesLoading } = useWorkflowStates()
   const createTask = useCreateTask()
 
-  const canSubmit = title.trim().length > 0 && stateId.length > 0
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<CreateTaskInput>({
+    resolver: zodResolver(createTaskSchema),
+    defaultValues: {
+      title: '',
+      description: null,
+      stateId: '',
+    },
+    mode: 'onChange',
+  })
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!canSubmit) return
-
+  function onSubmit(data: CreateTaskInput) {
     createTask.mutate(
       {
-        title: title.trim(),
-        description: description.trim() || null,
-        stateId,
+        ...data,
+        description: data.description?.trim() || null,
       },
       {
         onSuccess: () => {
-          setTitle('')
-          setDescription('')
-          setStateId('')
+          reset()
           onSuccess?.()
         },
       },
@@ -51,48 +58,58 @@ export function TaskCreateForm({ onCancel, onSuccess }: TaskCreateFormProps) {
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="space-y-4 rounded-lg border border-border bg-surface p-4"
     >
       <div className="space-y-1.5">
         <Label htmlFor="task-title">Title</Label>
         <Input
           id="task-title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
           placeholder="Task title"
           autoFocus
+          {...register('title')}
         />
+        {errors.title && (
+          <p className="text-sm text-destructive">{errors.title.message}</p>
+        )}
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="task-state">Status</Label>
-        <Select value={stateId} onValueChange={setStateId}>
-          <SelectTrigger id="task-state">
-            <SelectValue
-              placeholder={statesLoading ? 'Loading...' : 'Select a status'}
-            />
-          </SelectTrigger>
-          <SelectContent>
-            {workflowStates?.map((state) => (
-              <SelectItem key={state.id} value={state.id}>
-                {state.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Controller
+          name="stateId"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="task-state">
+                <SelectValue
+                  placeholder={statesLoading ? 'Loading...' : 'Select a status'}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {workflowStates?.map((state) => (
+                  <SelectItem key={state.id} value={state.id}>
+                    {state.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.stateId && (
+          <p className="text-sm text-destructive">{errors.stateId.message}</p>
+        )}
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="task-description">
-          Description <span className="text-muted font-normal">(optional)</span>
+          Description <span className="font-normal text-muted">(optional)</span>
         </Label>
         <Textarea
           id="task-description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
           placeholder="Add a description..."
           rows={3}
+          {...register('description')}
         />
       </div>
 
@@ -100,7 +117,7 @@ export function TaskCreateForm({ onCancel, onSuccess }: TaskCreateFormProps) {
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" disabled={!canSubmit || createTask.isPending}>
+        <Button type="submit" disabled={!isValid || createTask.isPending}>
           {createTask.isPending ? 'Creating...' : 'Create Task'}
         </Button>
       </div>
