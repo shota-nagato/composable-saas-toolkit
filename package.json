@@ -2,7 +2,8 @@
   "name": "toolkit",
   "version": "1.0.0",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "concurrently -n turso,app -c blue,green \"pnpm dev:turso\" \"turbo run dev\"",
+    "dev:turso": "turso dev --db-file .local/local.db",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.6",
     "@types/node": "^25.3.5",
+    "concurrently": "catalog:",
     "turbo": "^2.8.14",
     "typescript": "^5.9.3"
   }

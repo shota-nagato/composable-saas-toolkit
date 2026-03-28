@@ -7,9 +7,11 @@ export const client = hc<AppType>(baseUrl)
 
 type TasksGetEndpoint = typeof client.api.tasks.$get
 type TasksPostEndpoint = typeof client.api.tasks.$post
+type WorkflowStatesGetEndpoint = (typeof client.api)['workflow-states']['$get']
 
 export type Task = InferResponseType<TasksGetEndpoint>[number]
 export type CreateTaskInput = InferRequestType<TasksPostEndpoint>['json']
 export type UpdateTaskInput = InferRequestType<
   (typeof client.api.tasks)[':id']['$patch']
 >['json']
+export type WorkflowState = InferResponseType<WorkflowStatesGetEndpoint>[number]

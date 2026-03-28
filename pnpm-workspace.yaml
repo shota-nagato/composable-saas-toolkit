@@ -1,16 +1,21 @@
-catalogMode: strict
 packages:
   - apps/*
   - modules/*
   - packages/*
 
-overrides:
-  '@types/node': ^25.3.5
-
 catalog:
   '@hono/zod-validator': ^0.7.6
   '@libsql/client': ^0.17.0
+  '@radix-ui/react-select': ^2.2.5
   better-auth: ^1.4.12
+  clsx: ^2.1.1
+  concurrently: ^9.2.1
   drizzle-orm: ^0.45.1
   hono: ^4.12.5
+  tailwind-merge: ^3.3.0
   zod: ^4.3.6
+
+catalogMode: strict
+
+overrides:
+  '@types/node': ^25.3.5

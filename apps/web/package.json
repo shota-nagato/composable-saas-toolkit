@@ -12,6 +12,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
     "@toolkit/tasks": "workspace:*",
+    "@toolkit/ui": "workspace:*",
     "hono": "catalog:",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

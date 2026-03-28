@@ -1,0 +1,43 @@
+@theme {
+  /* ─── Primary (Violet - Linear inspired) ─── */
+  --color-primary: #5E6AD2;
+  --color-primary-hover: #4F5BC0;
+  --color-primary-active: #4250AF;
+  --color-primary-subtle: #EEEFFE;
+  --color-primary-foreground: #FFFFFF;
+
+  /* ─── Destructive ─── */
+  --color-destructive: #D94F57;
+  --color-destructive-hover: #C7434B;
+  --color-destructive-active: #B53940;
+  --color-destructive-subtle: #FEF0F0;
+  --color-destructive-foreground: #FFFFFF;
+
+  /* ─── Success ─── */
+  --color-success: #4CA154;
+  --color-success-subtle: #EEFBEF;
+
+  /* ─── Warning ─── */
+  --color-warning: #D8952F;
+  --color-warning-subtle: #FEF7EC;
+
+  /* ─── Neutral / Gray ─── */
+  --color-background: #FFFFFF;
+  --color-foreground: #1C1C1E;
+  --color-muted: #8A8F98;
+  --color-muted-foreground: #6B6F76;
+
+  /* ─── Surface (cards, inputs, elevated elements) ─── */
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F6F6F8;
+  --color-surface-active: #EDEDF0;
+
+  /* ─── Border ─── */
+  --color-border: #E0E1E6;
+  --color-border-hover: #C8C9CF;
+  --color-border-focus: #5E6AD2;
+
+  /* ─── Focus ring ─── */
+  --color-ring: #5E6AD2;
+  --color-ring-offset: #FFFFFF;
+}
