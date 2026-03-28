@@ -1,7 +1,7 @@
-import { useState } from 'react'
 import { Button } from '@toolkit/ui'
-import { useTasks } from './hooks/useTasks'
+import { useState } from 'react'
 import { TaskCreateForm } from './features/tasks/TaskCreateForm'
+import { useTasks } from './hooks/useTasks'
 
 function App() {
   const { data: tasks, isLoading } = useTasks()
