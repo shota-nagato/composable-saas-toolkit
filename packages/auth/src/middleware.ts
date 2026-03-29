@@ -1,30 +1,25 @@
 import { createMiddleware } from 'hono/factory'
-import { type AuthSessionData, type AuthUser, createAuth } from './server'
+import type { Auth, AuthSessionData, AuthUser } from './server'
 import type { AuthBindings } from './server/types'
 
 export interface AuthVariables {
   user: AuthUser
   session: AuthSessionData
+  auth: Auth
 }
 
 /**
  * 認証ミドルウェア
  *
  * セッションを検証し、ユーザー情報をコンテキストに設定する。
- * singleTenantMiddleware の後に適用すること（c.get('db') が必要）。
+ * authHandlerMiddleware の後に適用すること（c.get('auth') が必要）。
  */
 export const authMiddleware = () =>
   createMiddleware<{
     Bindings: AuthBindings
     Variables: AuthVariables & { db: import('@toolkit/db').Database }
   }>(async (c, next) => {
-    const db = c.get('db')
-    const auth = createAuth({
-      db,
-      baseUrl: c.env.BETTER_AUTH_URL,
-      secret: c.env.BETTER_AUTH_SECRET,
-    })
-
+    const auth = c.get('auth')
     const session = await auth.api.getSession({
       headers: c.req.raw.headers,
     })

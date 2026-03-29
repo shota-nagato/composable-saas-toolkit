@@ -24,8 +24,9 @@ app.use(
 // DB 接続（auth もこの DB を使う）
 app.use('*', singleTenantMiddleware())
 
-// better-auth ハンドラ（認証不要のパブリックルート）
-app.on(['GET', 'POST'], '/api/auth/**', async (c) => {
+// auth インスタンスをリクエストごとに作成し、コンテキストに共有
+// auth handler と authMiddleware が同一設定のインスタンスを使う
+app.use('*', async (c, next) => {
   const db = c.get('db')
   const auth = createAuth({
     db,
@@ -36,6 +37,13 @@ app.on(['GET', 'POST'], '/api/auth/**', async (c) => {
       : [],
     secureCookies: c.env.BETTER_AUTH_URL.startsWith('https://'),
   })
+  c.set('auth', auth)
+  await next()
+})
+
+// better-auth ハンドラ（認証不要のパブリックルート）
+app.on(['GET', 'POST'], '/api/auth/**', async (c) => {
+  const auth = c.get('auth')
   return auth.handler(c.req.raw)
 })
 

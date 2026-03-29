@@ -41,8 +41,9 @@ export function useUpdateTask() {
       parseResponse(
         client.api.tasks[':id'].$patch({ param: { id }, json: input }),
       ),
-    onSuccess: () => {
+    onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: taskKeys.all })
+      qc.invalidateQueries({ queryKey: taskKeys.detail(id) })
     },
     onError: handleMutationError,
   })
@@ -54,8 +55,9 @@ export function useDeleteTask() {
     mutationFn: async (id: string) => {
       await client.api.tasks[':id'].$delete({ param: { id } })
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       qc.invalidateQueries({ queryKey: taskKeys.all })
+      qc.removeQueries({ queryKey: taskKeys.detail(id) })
     },
     onError: handleMutationError,
   })

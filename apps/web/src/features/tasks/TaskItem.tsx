@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import {
   Button,
   Dialog,
@@ -17,6 +18,7 @@ import { useState } from 'react'
 import CheckIcon from '../../assets/svg/actions/check.svg?react'
 import EditIcon from '../../assets/svg/actions/edit.svg?react'
 import MoreVerticalIcon from '../../assets/svg/actions/more-vertical.svg?react'
+import PriorityNoneIcon from '../../assets/svg/actions/priority-none.svg?react'
 import TrashIcon from '../../assets/svg/actions/trash.svg?react'
 import { useDeleteTask, useUpdateTask } from '../../hooks/useTasks'
 import type { Task, WorkflowState } from '../../lib/api'
@@ -26,9 +28,10 @@ import { TaskEditForm } from './TaskEditForm'
 interface TaskItemProps {
   task: Task
   workflowStates: WorkflowState[]
+  displayId?: string
 }
 
-export function TaskItem({ task, workflowStates }: TaskItemProps) {
+export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showStatusMenu, setShowStatusMenu] = useState(false)
@@ -61,7 +64,15 @@ export function TaskItem({ task, workflowStates }: TaskItemProps) {
 
   return (
     <>
-      <li className="group flex items-center gap-3 rounded-md px-3 py-1.5 transition-colors hover:bg-surface-hover">
+      <li className="group flex items-center gap-2.5 rounded-md px-3 py-1.5 transition-colors hover:bg-surface-hover">
+        {/* Priority (placeholder) */}
+        <PriorityNoneIcon className="h-4 w-4 shrink-0 text-muted/50" />
+
+        {/* Display ID */}
+        {displayId && (
+          <span className="w-16 shrink-0 text-xs text-muted">{displayId}</span>
+        )}
+
         {/* Status icon — click to open status picker */}
         <DropdownMenu open={showStatusMenu} onOpenChange={setShowStatusMenu}>
           <DropdownMenuTrigger asChild>
@@ -89,18 +100,14 @@ export function TaskItem({ task, workflowStates }: TaskItemProps) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Title — click to edit */}
-        <span
-          className="min-w-0 flex-1 cursor-pointer truncate text-sm text-foreground"
-          onClick={() => setIsEditing(true)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') setIsEditing(true)
-          }}
-          role="button"
-          tabIndex={0}
+        {/* Title — click to navigate to detail */}
+        <Link
+          to="/tasks/$taskId"
+          params={{ taskId: task.id }}
+          className="min-w-0 flex-1 truncate text-sm text-foreground hover:text-primary"
         >
           {task.title}
-        </span>
+        </Link>
 
         {/* ⋮ More menu */}
         <DropdownMenu>
