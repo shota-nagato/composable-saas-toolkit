@@ -32,6 +32,8 @@ export type { InputProps } from './components/input'
 export { Input } from './components/input'
 export type { LabelProps } from './components/label'
 export { Label } from './components/label'
+export type { RichTextEditorProps } from './components/rich-text-editor'
+export { isEmptyHtml, RichTextEditor } from './components/rich-text-editor'
 export type {
   SelectContentProps,
   SelectItemProps,

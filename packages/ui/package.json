@@ -15,6 +15,7 @@
     "./select": "./src/components/select.tsx",
     "./tooltip": "./src/components/tooltip.tsx",
     "./avatar": "./src/components/avatar.tsx",
+    "./rich-text-editor": "./src/components/rich-text-editor.tsx",
     "./sheet": "./src/components/sheet.tsx",
     "./utils": "./src/lib/utils.ts"
   },
@@ -23,6 +24,11 @@
     "@radix-ui/react-dropdown-menu": "catalog:",
     "@radix-ui/react-select": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
+    "@tiptap/extension-link": "catalog:",
+    "@tiptap/extension-placeholder": "catalog:",
+    "@tiptap/pm": "catalog:",
+    "@tiptap/react": "catalog:",
+    "@tiptap/starter-kit": "catalog:",
     "clsx": "catalog:",
     "tailwind-merge": "catalog:"
   },

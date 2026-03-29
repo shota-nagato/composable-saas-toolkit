@@ -25,7 +25,7 @@
   "engines": {
     "node": "22.21.1",
     "pnpm": "10.22.0",
-    "npm": "pnpm\u3092\u4f7f\u3063\u3066\u304f\u3060\u3055\u3044"
+    "npm": "pnpmを使ってください"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.6",

@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 export const createTaskSchema = z.object({
   title: z.string().min(1).max(255),
-  description: z.string().max(5000).nullable().optional(),
+  description: z.string().max(10000).nullable().optional(),
   stateId: z.string().min(1),
   priority: z.enum(taskPriorityValues).optional().default('no_priority'),
 })
@@ -11,7 +11,7 @@ export const createTaskSchema = z.object({
 export const updateTaskSchema = z
   .object({
     title: z.string().min(1).max(255),
-    description: z.string().max(5000).nullable().optional(),
+    description: z.string().max(10000).nullable().optional(),
     stateId: z.string().min(1),
     priority: z.enum(taskPriorityValues),
   })

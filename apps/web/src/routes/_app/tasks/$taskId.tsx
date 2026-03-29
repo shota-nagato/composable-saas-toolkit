@@ -5,8 +5,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  isEmptyHtml,
+  RichTextEditor,
 } from '@toolkit/ui'
-import { useRef, useState } from 'react'
+import DOMPurify from 'dompurify'
+import { useCallback, useRef, useState } from 'react'
 import CheckIcon from '../../../assets/svg/actions/check.svg?react'
 import { PriorityIcon } from '../../../features/tasks/PriorityIcon'
 import { StatusIcon } from '../../../features/tasks/StatusIcon'
@@ -78,7 +81,7 @@ function TaskDetailPage() {
               onSave={(description) =>
                 updateTask.mutate({
                   id: task.id,
-                  description: description.trim() || null,
+                  description: isEmptyHtml(description) ? null : description,
                 })
               }
             />
@@ -248,50 +251,40 @@ function EditableDescription({
   onSave: (v: string) => void
 }) {
   const [isEditing, setIsEditing] = useState(false)
-  const [draft, setDraft] = useState(value)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const draftRef = useRef(value)
+  const valueAtEditStartRef = useRef(value)
 
   function handleStartEdit() {
-    setDraft(value)
+    draftRef.current = value
+    valueAtEditStartRef.current = value
     setIsEditing(true)
-    setTimeout(() => {
-      const el = textareaRef.current
-      if (el) {
-        el.focus()
-        el.style.height = 'auto'
-        el.style.height = `${el.scrollHeight}px`
-      }
-    }, 0)
   }
 
-  function handleSave() {
+  const handleChange = useCallback((html: string) => {
+    draftRef.current = html
+  }, [])
+
+  const handleBlur = useCallback(() => {
     setIsEditing(false)
-    if (draft !== value) {
-      onSave(draft)
+    const draft = draftRef.current
+    if (draft !== valueAtEditStartRef.current) {
+      onSave(isEmptyHtml(draft) ? '' : draft)
     }
-  }
+  }, [onSave])
 
   if (isEditing) {
     return (
-      <textarea
-        ref={textareaRef}
-        value={draft}
-        onChange={(e) => {
-          setDraft(e.target.value)
-          e.target.style.height = 'auto'
-          e.target.style.height = `${e.target.scrollHeight}px`
-        }}
-        onBlur={handleSave}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape') setIsEditing(false)
-        }}
-        className="w-full resize-none bg-transparent text-sm leading-relaxed text-foreground outline-none"
-        rows={3}
+      <RichTextEditor
+        content={value}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        placeholder="Add description..."
+        autofocus
       />
     )
   }
 
-  if (!value) {
+  if (!value || isEmptyHtml(value)) {
     return (
       <button
         type="button"
@@ -307,9 +300,8 @@ function EditableDescription({
     <button
       type="button"
       onClick={handleStartEdit}
-      className="w-full cursor-text whitespace-pre-wrap text-left text-sm leading-relaxed text-foreground hover:text-foreground/80"
-    >
-      {value}
-    </button>
+      className="tiptap-content w-full cursor-text text-left text-sm leading-relaxed text-foreground hover:text-foreground/80"
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) }}
+    />
   )
 }

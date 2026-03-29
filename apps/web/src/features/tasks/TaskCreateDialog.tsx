@@ -9,7 +9,8 @@ import {
   DialogTitle,
   DropdownMenuItem,
   Input,
-  Textarea,
+  isEmptyHtml,
+  RichTextEditor,
 } from '@toolkit/ui'
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -69,7 +70,7 @@ export function TaskCreateDialog({
     createTask.mutate(
       {
         ...data,
-        description: data.description?.trim() || null,
+        description: isEmptyHtml(data.description) ? null : data.description,
       },
       {
         onSuccess: () => {
@@ -113,11 +114,17 @@ export function TaskCreateDialog({
 
           {/* Description */}
           <div className="px-5 pb-3">
-            <Textarea
-              placeholder="Add description..."
-              rows={3}
-              className="resize-none border-none bg-transparent px-0 shadow-none placeholder:text-muted focus-visible:ring-0"
-              {...register('description')}
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <RichTextEditor
+                  content={field.value ?? ''}
+                  onChange={(html) => field.onChange(html)}
+                  placeholder="Add description..."
+                  className="min-h-24"
+                />
+              )}
             />
           </div>
 
