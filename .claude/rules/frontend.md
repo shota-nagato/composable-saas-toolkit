@@ -13,8 +13,14 @@ paths:
 ## TanStack Query
 - 1 リソース 1 ファイル: `hooks/useTasks.ts`, `hooks/useWorkflowStates.ts`
 - Query key factory: `taskKeys.all`, `taskKeys.detail(id)`
-- Mutation の onSuccess で関連キーを invalidate
+- Mutation の onSuccess で `all` と `detail(id)` の両方を invalidate する
+- Delete の onSuccess では `detail(id)` を `removeQueries` で即時削除
 - `parseResponse` from `hono/client` でレスポンス処理。DetailedError で型付きエラー
+
+## TanStack Router
+- 認証ガードは `beforeLoad` で `throw redirect({ to: '/login' })` を使用
+- `throw new Error` + `errorComponent` での遷移は禁止（ルーターの状態が壊れる）
+- レイアウトルートのアンダースコア規約: `_app`（認証後）, `_auth`（未認証）
 
 ## Forms
 - react-hook-form + `@hookform/resolvers/zod`

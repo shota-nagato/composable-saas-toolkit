@@ -6,11 +6,13 @@ import { MobileNav } from './MobileNav'
 import { MobileTopBar } from './MobileTopBar'
 import { ModuleSwitcher } from './ModuleSwitcher'
 
+/** better-auth getSession の戻り値から AppShell が必要とするフィールドのみ抽出 */
+interface AppShellSession {
+  user: { name: string; email: string; image?: string | null }
+}
+
 interface AppShellProps {
-  session: {
-    user: { name: string; email: string; image?: string | null }
-    session: { id: string }
-  }
+  session: AppShellSession
 }
 
 export function AppShell({ session }: AppShellProps) {

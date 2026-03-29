@@ -29,6 +29,7 @@ apps/
 modules/
   tasks/            → Cloudflare Workers API (@toolkit/tasks)
 packages/
+  auth/             → Authentication (better-auth) (@toolkit/auth)
   db/               → Drizzle schema + client (@toolkit/db)
   ui/               → UI component library (@toolkit/ui)
   tenant/           → Tenant middleware (@toolkit/tenant)
@@ -40,13 +41,16 @@ packages/
 ```
 apps/web → modules/tasks (type-only, for AppType)
          → packages/ui
-modules/tasks → packages/db
+         → packages/auth (client-side auth)
+modules/tasks → packages/auth
+              → packages/db
               → packages/tenant
+packages/auth   → packages/db
 packages/tenant → packages/db
 ```
 
 - Upper layers may depend on lower layers. Never the reverse.
-- `packages/ui` has NO dependency on `packages/db` or `modules/tasks`.
+- `packages/ui` has NO dependency on `packages/db`, `packages/auth`, or `modules/tasks`.
 - `packages/db` has NO dependency on any other workspace package.
 
 ## Key Architecture Decisions

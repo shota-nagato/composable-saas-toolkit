@@ -181,15 +181,13 @@ function EditableTitle({
   }
 
   return (
-    <h1
+    <button
+      type="button"
       onClick={handleStartEdit}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') handleStartEdit()
-      }}
-      className="cursor-text text-2xl font-bold text-foreground hover:text-foreground/80"
+      className="w-full cursor-text text-left text-2xl font-bold text-foreground hover:text-foreground/80"
     >
       {value}
-    </h1>
+    </button>
   )
 }
 
@@ -246,27 +244,23 @@ function EditableDescription({
 
   if (!value) {
     return (
-      <p
+      <button
+        type="button"
         onClick={handleStartEdit}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') handleStartEdit()
-        }}
-        className="cursor-text text-sm text-muted italic hover:text-muted/70"
+        className="w-full cursor-text text-left text-sm text-muted italic hover:text-muted/70"
       >
         Add description...
-      </p>
+      </button>
     )
   }
 
   return (
-    <p
+    <button
+      type="button"
       onClick={handleStartEdit}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') handleStartEdit()
-      }}
-      className="cursor-text whitespace-pre-wrap text-sm leading-relaxed text-foreground hover:text-foreground/80"
+      className="w-full cursor-text whitespace-pre-wrap text-left text-sm leading-relaxed text-foreground hover:text-foreground/80"
     >
       {value}
-    </p>
+    </button>
   )
 }

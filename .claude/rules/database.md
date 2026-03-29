@@ -10,6 +10,7 @@ paths:
 - カラム名: SQL は `snake_case`, Drizzle は `camelCase`
 - PK は `TEXT` 型、`crypto.randomUUID()` で生成
 - タイムスタンプは `TEXT` (ISO datetime)。`INTEGER` (unix) は使わない
+  - **例外**: `packages/db/src/schema/auth.ts` は better-auth CLI が生成。`INTEGER` (timestamp_ms) を使用。手動変更禁止
 - FK は明示的 `.references(() => table.id)`。デフォルトで cascade delete なし
 - Enum は `text('col', { enum: [...] as const })` + SQLite `CHECK` 制約
 - Boolean は `integer('col', { mode: 'boolean' })`
