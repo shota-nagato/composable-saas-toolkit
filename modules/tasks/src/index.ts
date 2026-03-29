@@ -1,12 +1,25 @@
 import { authMiddleware } from '@toolkit/auth/middleware'
 import { createAuth } from '@toolkit/auth/server'
 import { singleTenantMiddleware } from '@toolkit/tenant'
+import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
 import { factory } from './factory'
 import taskRoutes from './routes/tasks'
 import workflowStateRoutes from './routes/workflow-states'
 
 const app = factory.createApp()
+
+// CORS（dev: Vite proxy 経由でも OPTIONS preflight が飛ぶため必要）
+// TODO(production): origin を本番ドメインに制限する（現在は全オリジン反射）
+app.use(
+  '/api/*',
+  cors({
+    origin: (origin) => origin,
+    allowHeaders: ['Content-Type', 'Authorization', 'User-Agent'],
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  }),
+)
 
 // DB 接続（auth もこの DB を使う）
 app.use('*', singleTenantMiddleware())
@@ -18,6 +31,9 @@ app.on(['GET', 'POST'], '/api/auth/**', async (c) => {
     db,
     baseUrl: c.env.BETTER_AUTH_URL,
     secret: c.env.BETTER_AUTH_SECRET,
+    trustedOrigins: c.env.BETTER_AUTH_TRUSTED_ORIGINS
+      ? c.env.BETTER_AUTH_TRUSTED_ORIGINS.split(',')
+      : [],
     secureCookies: c.env.BETTER_AUTH_URL.startsWith('https://'),
   })
   return auth.handler(c.req.raw)

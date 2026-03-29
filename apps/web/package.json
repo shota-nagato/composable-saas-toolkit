@@ -13,6 +13,8 @@
   "dependencies": {
     "@hookform/resolvers": "catalog:",
     "@tanstack/react-query": "^5.90.21",
+    "@tanstack/react-router": "catalog:",
+    "@toolkit/auth": "workspace:*",
     "@toolkit/tasks": "workspace:*",
     "@toolkit/ui": "workspace:*",
     "hono": "catalog:",
@@ -25,6 +27,7 @@
     "@eslint/js": "^9.39.1",
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-query-devtools": "^5.91.3",
+    "@tanstack/router-plugin": "catalog:",
     "@types/node": "^25.3.5",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

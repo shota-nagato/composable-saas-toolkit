@@ -1,11 +1,16 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { Button } from '@toolkit/ui'
 import { useState } from 'react'
-import { TaskCreateForm } from './features/tasks/TaskCreateForm'
-import { TaskItem } from './features/tasks/TaskItem'
-import { useTasks } from './hooks/useTasks'
-import { useWorkflowStates } from './hooks/useWorkflowStates'
+import { TaskCreateForm } from '../../features/tasks/TaskCreateForm'
+import { TaskItem } from '../../features/tasks/TaskItem'
+import { useTasks } from '../../hooks/useTasks'
+import { useWorkflowStates } from '../../hooks/useWorkflowStates'
 
-function App() {
+export const Route = createFileRoute('/_app/')({
+  component: TaskListPage,
+})
+
+function TaskListPage() {
   const { data: tasks, isLoading: tasksLoading } = useTasks()
   const { data: workflowStates, isLoading: statesLoading } = useWorkflowStates()
   const [showForm, setShowForm] = useState(false)
@@ -49,5 +54,3 @@ function App() {
     </div>
   )
 }
-
-export default App

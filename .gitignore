@@ -12,6 +12,9 @@ docs/memo/
 dist/
 *.tsbuildinfo
 
+# TanStack Router (auto-generated)
+routeTree.gen.ts
+
 # Environment
 .env
 .env.*

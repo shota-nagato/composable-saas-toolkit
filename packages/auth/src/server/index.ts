@@ -53,6 +53,7 @@ export const createAuth = ({
     plugins: [admin()],
     trustedOrigins: trustedOrigins ?? [], // TODO(production): フロントエンド URL を必ず含める
     advanced: {
+      cookiePrefix: 'toolkit',
       defaultCookieAttributes: {
         sameSite: 'lax',
         secure: secureCookies,
