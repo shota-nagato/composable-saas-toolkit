@@ -40,6 +40,7 @@ packages/
 
 ```
 apps/web → modules/tasks (type-only, for AppType)
+         → packages/db (shared constants like taskPriorityValues)
          → packages/ui
          → packages/auth (client-side auth)
 modules/tasks → packages/auth

@@ -13,7 +13,21 @@
       "idx": 1,
       "version": "6",
       "when": 1774761332125,
-      "tag": "20260329051532_add-auth-tables",
+      "tag": "20260329051532_add_auth_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774785632762,
+      "tag": "20260329120032_add_priority_to_tasks",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1774785686707,
+      "tag": "20260329120126_add_priority_check",
       "breakpoints": true
     }
   ]

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { taskPriorityValues } from '@toolkit/db'
 import { updateTaskSchema } from '@toolkit/tasks'
 import {
   Button,
@@ -14,6 +15,8 @@ import {
 import { Controller, useForm } from 'react-hook-form'
 import { useUpdateTask } from '../../hooks/useTasks'
 import type { Task, UpdateTaskInput, WorkflowState } from '../../lib/api'
+import { priorityLabels } from '../../lib/priority'
+import { PriorityIcon } from './PriorityIcon'
 
 interface TaskEditFormProps {
   task: Task
@@ -41,6 +44,7 @@ export function TaskEditForm({
       title: task.title,
       description: task.description ?? '',
       stateId: task.stateId,
+      priority: task.priority,
     },
     mode: 'onChange',
   })
@@ -76,26 +80,53 @@ export function TaskEditForm({
           )}
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor={`edit-state-${task.id}`}>Status</Label>
-          <Controller
-            name="stateId"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id={`edit-state-${task.id}`}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {workflowStates.map((state) => (
-                    <SelectItem key={state.id} value={state.id}>
-                      {state.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor={`edit-state-${task.id}`}>Status</Label>
+            <Controller
+              name="stateId"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id={`edit-state-${task.id}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workflowStates.map((state) => (
+                      <SelectItem key={state.id} value={state.id}>
+                        {state.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor={`edit-priority-${task.id}`}>Priority</Label>
+            <Controller
+              name="priority"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id={`edit-priority-${task.id}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {taskPriorityValues.map((p) => (
+                      <SelectItem key={p} value={p}>
+                        <span className="flex items-center gap-2">
+                          <PriorityIcon priority={p} />
+                          {priorityLabels[p]}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
         </div>
 
         <div className="space-y-1.5">

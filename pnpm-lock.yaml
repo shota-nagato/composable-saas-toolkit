@@ -113,6 +113,9 @@ importers:
       '@toolkit/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@toolkit/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@toolkit/tasks':
         specifier: workspace:*
         version: link:../../modules/tasks

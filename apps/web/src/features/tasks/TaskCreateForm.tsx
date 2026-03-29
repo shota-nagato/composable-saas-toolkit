@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { taskPriorityValues } from '@toolkit/db'
 import { createTaskSchema } from '@toolkit/tasks'
 import {
   Button,
@@ -15,6 +16,8 @@ import { Controller, useForm } from 'react-hook-form'
 import { useCreateTask } from '../../hooks/useTasks'
 import { useWorkflowStates } from '../../hooks/useWorkflowStates'
 import type { CreateTaskInput } from '../../lib/api'
+import { priorityLabels } from '../../lib/priority'
+import { PriorityIcon } from './PriorityIcon'
 
 interface TaskCreateFormProps {
   onCancel: () => void
@@ -37,6 +40,7 @@ export function TaskCreateForm({ onCancel, onSuccess }: TaskCreateFormProps) {
       title: '',
       description: null,
       stateId: '',
+      priority: 'no_priority',
     },
     mode: 'onChange',
   })
@@ -74,31 +78,58 @@ export function TaskCreateForm({ onCancel, onSuccess }: TaskCreateFormProps) {
         )}
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="task-state">Status</Label>
-        <Controller
-          name="stateId"
-          control={control}
-          render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger id="task-state">
-                <SelectValue
-                  placeholder={statesLoading ? 'Loading...' : 'Select a status'}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {workflowStates?.map((state) => (
-                  <SelectItem key={state.id} value={state.id}>
-                    {state.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="task-state">Status</Label>
+          <Controller
+            name="stateId"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="task-state">
+                  <SelectValue
+                    placeholder={statesLoading ? 'Loading...' : 'Select status'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {workflowStates?.map((state) => (
+                    <SelectItem key={state.id} value={state.id}>
+                      {state.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.stateId && (
+            <p className="text-sm text-destructive">{errors.stateId.message}</p>
           )}
-        />
-        {errors.stateId && (
-          <p className="text-sm text-destructive">{errors.stateId.message}</p>
-        )}
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="task-priority">Priority</Label>
+          <Controller
+            name="priority"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="task-priority">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {taskPriorityValues.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      <span className="flex items-center gap-2">
+                        <PriorityIcon priority={p} />
+                        {priorityLabels[p]}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
       </div>
 
       <div className="space-y-1.5">

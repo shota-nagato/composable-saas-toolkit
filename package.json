@@ -11,7 +11,9 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "format": "biome format --write .",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "db:migrate": "pnpm --filter @toolkit/db db:migrate",
+    "db:seed": "pnpm --filter @toolkit/db seed"
   },
   "keywords": [],
   "author": "",

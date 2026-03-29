@@ -21,6 +21,13 @@
   --color-warning: #D8952F;
   --color-warning-subtle: #FEF7EC;
 
+  /* ─── Priority ─── */
+  --color-priority-urgent: #E5484D;
+  --color-priority-high: #F76B15;
+  --color-priority-medium: #FFBA18;
+  --color-priority-low: #52AEFF;
+  --color-priority-none: #8A8F98;
+
   /* ─── Neutral / Gray ─── */
   --color-background: #FFFFFF;
   --color-foreground: #1C1C1E;

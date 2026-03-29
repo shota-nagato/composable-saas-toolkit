@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { taskPriorityValues } from '@toolkit/db'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,10 +8,12 @@ import {
 } from '@toolkit/ui'
 import { useRef, useState } from 'react'
 import CheckIcon from '../../../assets/svg/actions/check.svg?react'
+import { PriorityIcon } from '../../../features/tasks/PriorityIcon'
 import { StatusIcon } from '../../../features/tasks/StatusIcon'
 import { useTask, useUpdateTask } from '../../../hooks/useTasks'
 import { useWorkflowStates } from '../../../hooks/useWorkflowStates'
 import { formatDate } from '../../../lib/format'
+import { priorityLabels } from '../../../lib/priority'
 
 export const Route = createFileRoute('/_app/tasks/$taskId')({
   component: TaskDetailPage,
@@ -32,7 +35,7 @@ function TaskDetailPage() {
         <p className="text-sm text-muted">Task not found</p>
         <Link
           to="/tasks"
-          search={{ filter: 'all', sort: 'manual' }}
+          search={{ filter: 'all' }}
           className="mt-2 inline-block text-sm text-primary"
         >
           Back to tasks
@@ -51,7 +54,7 @@ function TaskDetailPage() {
         <div className="flex items-center gap-1.5 border-b border-border px-6 py-2.5 text-sm text-muted">
           <Link
             to="/tasks"
-            search={{ filter: 'all', sort: 'manual' }}
+            search={{ filter: 'all' }}
             className="hover:text-foreground"
           >
             Tasks
@@ -115,6 +118,44 @@ function TaskDetailPage() {
                   <StatusIcon type={state.type} />
                   <span className="flex-1">{state.name}</span>
                   {state.id === task.stateId && (
+                    <CheckIcon
+                      className="text-primary"
+                      width={14}
+                      height={14}
+                    />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Priority */}
+        <div className="mb-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-surface-hover"
+              >
+                <PriorityIcon priority={task.priority} />
+                <span className="text-foreground">
+                  {priorityLabels[task.priority]}
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-44">
+              {taskPriorityValues.map((p) => (
+                <DropdownMenuItem
+                  key={p}
+                  onSelect={() =>
+                    updateTask.mutate({ id: task.id, priority: p })
+                  }
+                  className="gap-2.5"
+                >
+                  <PriorityIcon priority={p} />
+                  <span className="flex-1">{priorityLabels[p]}</span>
+                  {p === task.priority && (
                     <CheckIcon
                       className="text-primary"
                       width={14}

@@ -5,6 +5,8 @@ export {
   commonColumns,
   sessions,
   sessionsRelations,
+  type TaskPriority,
+  taskPriorityValues,
   tasks,
   users,
   usersRelations,

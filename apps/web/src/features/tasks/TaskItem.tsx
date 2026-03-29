@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { taskPriorityValues } from '@toolkit/db'
 import {
   Button,
   Dialog,
@@ -18,10 +19,11 @@ import { useState } from 'react'
 import CheckIcon from '../../assets/svg/actions/check.svg?react'
 import EditIcon from '../../assets/svg/actions/edit.svg?react'
 import MoreVerticalIcon from '../../assets/svg/actions/more-vertical.svg?react'
-import PriorityNoneIcon from '../../assets/svg/actions/priority-none.svg?react'
 import TrashIcon from '../../assets/svg/actions/trash.svg?react'
 import { useDeleteTask, useUpdateTask } from '../../hooks/useTasks'
 import type { Task, WorkflowState } from '../../lib/api'
+import { priorityLabels } from '../../lib/priority'
+import { PriorityIcon } from './PriorityIcon'
 import { StatusIcon } from './StatusIcon'
 import { TaskEditForm } from './TaskEditForm'
 
@@ -35,6 +37,7 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showStatusMenu, setShowStatusMenu] = useState(false)
+  const [showPriorityMenu, setShowPriorityMenu] = useState(false)
   const updateTask = useUpdateTask()
   const deleteTask = useDeleteTask()
 
@@ -43,6 +46,13 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
   function handleStatusChange(stateId: string) {
     updateTask.mutate({ id: task.id, stateId })
     setShowStatusMenu(false)
+  }
+
+  function handlePriorityChange(priority: Task['priority']) {
+    updateTask.mutate(
+      { id: task.id, priority },
+      { onSettled: () => setShowPriorityMenu(false) },
+    )
   }
 
   function handleDelete() {
@@ -65,8 +75,35 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
   return (
     <>
       <li className="group flex items-center gap-2.5 rounded-md px-3 py-1.5 transition-colors hover:bg-surface-hover">
-        {/* Priority (placeholder) */}
-        <PriorityNoneIcon className="h-4 w-4 shrink-0 text-muted/50" />
+        {/* Priority — click to open priority picker */}
+        <DropdownMenu
+          open={showPriorityMenu}
+          onOpenChange={setShowPriorityMenu}
+        >
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="shrink-0 rounded p-0.5 transition-colors hover:bg-surface-active"
+            >
+              <PriorityIcon priority={task.priority} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-44">
+            {taskPriorityValues.map((p) => (
+              <DropdownMenuItem
+                key={p}
+                onSelect={() => handlePriorityChange(p)}
+                className="gap-2.5"
+              >
+                <PriorityIcon priority={p} />
+                <span className="flex-1">{priorityLabels[p]}</span>
+                {p === task.priority && (
+                  <CheckIcon className="text-primary" width={14} height={14} />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Display ID */}
         {displayId && (

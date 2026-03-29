@@ -4,6 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "db:migrate": "drizzle-kit migrate",
+    "db:generate": "drizzle-kit generate",
     "seed": "tsx seed/index.ts"
   },
   "exports": {
