@@ -9,6 +9,8 @@ export {
 } from './auth'
 export { commonColumns } from './common'
 export {
+  type TaskPriority,
+  taskPriorityValues,
   tasks,
   type WorkflowStateType,
   workflowStates,

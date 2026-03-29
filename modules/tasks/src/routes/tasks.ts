@@ -22,6 +22,7 @@ const app = factory
       title: body.title,
       description: body.description ?? null,
       stateId: body.stateId,
+      priority: body.priority,
     })
 
     const [created] = await db.select().from(tasks).where(eq(tasks.id, id))
