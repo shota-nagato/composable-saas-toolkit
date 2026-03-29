@@ -21,7 +21,10 @@ export function ModuleSwitcher({ userName, userImage }: ModuleSwitcherProps) {
       {/* Module icons */}
       <div className="flex flex-1 flex-col items-center gap-1">
         {modules.map((mod) => {
-          const isActive = location.pathname.startsWith(mod.basePath)
+          const isActive =
+            mod.basePath === '/'
+              ? location.pathname === '/'
+              : location.pathname.startsWith(mod.basePath)
           return (
             <Tooltip key={mod.id}>
               <TooltipTrigger asChild>
