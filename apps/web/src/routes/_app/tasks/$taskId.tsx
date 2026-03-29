@@ -30,7 +30,11 @@ function TaskDetailPage() {
     return (
       <div className="p-6">
         <p className="text-sm text-muted">Task not found</p>
-        <Link to="/tasks" className="mt-2 inline-block text-sm text-primary">
+        <Link
+          to="/tasks"
+          search={{ filter: 'all', sort: 'manual' }}
+          className="mt-2 inline-block text-sm text-primary"
+        >
           Back to tasks
         </Link>
       </div>
@@ -45,7 +49,11 @@ function TaskDetailPage() {
       <div className="flex-1 overflow-y-auto">
         {/* Breadcrumb */}
         <div className="flex items-center gap-1.5 border-b border-border px-6 py-2.5 text-sm text-muted">
-          <Link to="/tasks" className="hover:text-foreground">
+          <Link
+            to="/tasks"
+            search={{ filter: 'all', sort: 'manual' }}
+            className="hover:text-foreground"
+          >
             Tasks
           </Link>
           <span>/</span>
