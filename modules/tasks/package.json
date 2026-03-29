@@ -13,8 +13,10 @@
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
+    "@toolkit/auth": "workspace:*",
     "@toolkit/db": "workspace:*",
     "@toolkit/tenant": "workspace:*",
+    "better-auth": "catalog:",
     "@hono/zod-validator": "catalog:",
     "drizzle-orm": "catalog:",
     "hono": "catalog:",

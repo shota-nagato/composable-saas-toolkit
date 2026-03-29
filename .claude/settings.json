@@ -57,6 +57,16 @@
             "command": "jq -r '.tool_input.file_path // empty' | xargs -I{} npx @biomejs/biome check --write --unsafe {} 2>/dev/null; true"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && npx @biomejs/biome check --write --unsafe --changed . 2>/dev/null; true",
+            "async": true
+          }
+        ]
       }
     ],
     "PreToolUse": [

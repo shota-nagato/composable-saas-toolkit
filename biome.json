@@ -55,7 +55,8 @@
       "!**/generated",
       "!**/*.d.ts",
       "!**/*.css",
-      "!**/migrations"
+      "!**/migrations",
+      "!**/auth.config.ts"
     ]
   }
 }
