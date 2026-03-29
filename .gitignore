@@ -20,3 +20,6 @@ dist/
 # Turso local DB
 .local/*
 !.local/.gitkeep
+
+# Claude Code local settings
+.claude/settings.local.json

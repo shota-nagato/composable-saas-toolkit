@@ -1,0 +1,85 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm check)",
+      "Bash(pnpm check:fix)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm test)",
+      "Bash(pnpm build)",
+      "Bash(pnpm install)",
+      "Bash(pnpm dev *)",
+      "Bash(cd packages/db && npx drizzle-kit generate *)",
+      "Bash(cd packages/db && pnpm db:migrate)",
+      "Bash(cd packages/db && pnpm seed)",
+      "Bash(npx vitest *)",
+      "Bash(npx tsc *)",
+      "Bash(npx @biomejs/biome *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git stash *)",
+      "Bash(gh pr *)",
+      "Bash(gh issue *)",
+      "WebFetch(domain:hono.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:better-auth.com)",
+      "WebFetch(domain:docs.turso.tech)",
+      "WebFetch(domain:orm.drizzle.team)",
+      "WebFetch(domain:tanstack.com)",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "WebSearch"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)",
+      "Edit(**/.env*)",
+      "Write(**/.env*)",
+      "Edit(**/.dev.vars*)",
+      "Write(**/.dev.vars*)",
+      "Edit(**/migrations/*.sql)",
+      "Write(**/migrations/*.sql)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | xargs -I{} npx @biomejs/biome check --write --unsafe {} 2>/dev/null; true"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/protect-files.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Reminder: Use pnpm (not npm). Biome hook auto-formats on edit. Run pnpm check:fix before committing.'"
+          }
+        ]
+      }
+    ]
+  }
+}
