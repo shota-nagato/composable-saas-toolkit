@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import type { taskPriorityValues } from '@toolkit/db'
-import { Button, cn } from '@toolkit/ui'
+import { cn } from '@toolkit/ui'
 import { useMemo, useState } from 'react'
 import ChevronDownIcon from '../../../assets/svg/actions/chevron-down.svg?react'
 import { StatusIcon } from '../../../features/tasks/StatusIcon'
-import { TaskCreateForm } from '../../../features/tasks/TaskCreateForm'
 import { TaskItem } from '../../../features/tasks/TaskItem'
+import { TasksToolbar } from '../../../features/tasks/TasksToolbar'
 import { useTasks } from '../../../hooks/useTasks'
 import { useWorkflowStates } from '../../../hooks/useWorkflowStates'
 import type { Task, WorkflowState } from '../../../lib/api'
@@ -41,11 +41,22 @@ interface TaskGroup {
   tasks: Task[]
 }
 
+const listOrder: Record<string, number> = {
+  in_review: 0,
+  started: 1,
+  unstarted: 2,
+  backlog: 3,
+  completed: 4,
+  canceled: 5,
+}
+
 function groupTasksByState(
   tasks: Task[],
   workflowStates: WorkflowState[],
 ): TaskGroup[] {
-  const sorted = [...workflowStates].sort((a, b) => a.position - b.position)
+  const sorted = [...workflowStates].sort(
+    (a, b) => (listOrder[a.type] ?? 99) - (listOrder[b.type] ?? 99),
+  )
   return sorted
     .map((state) => ({
       state,
@@ -56,17 +67,10 @@ function groupTasksByState(
     .filter((group) => group.tasks.length > 0)
 }
 
-const filterTabs = [
-  { label: 'All issues', value: 'all' as const },
-  { label: 'Active', value: 'active' as const },
-  { label: 'Backlog', value: 'backlog' as const },
-]
-
 function TaskListPage() {
   const { filter } = Route.useSearch()
   const { data: tasks, isLoading: tasksLoading } = useTasks()
   const { data: workflowStates, isLoading: statesLoading } = useWorkflowStates()
-  const [showForm, setShowForm] = useState(false)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
 
   const filteredTasks = useMemo(() => {
@@ -76,7 +80,7 @@ function TaskListPage() {
     const stateTypeMap = new Map(workflowStates.map((s) => [s.id, s.type]))
     return tasks.filter((task) => {
       const type = stateTypeMap.get(task.stateId)
-      if (filter === 'active') return type === 'started'
+      if (filter === 'active') return type === 'started' || type === 'in_review'
       if (filter === 'backlog')
         return type === 'backlog' || type === 'unstarted'
       return true
@@ -106,48 +110,10 @@ function TaskListPage() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between border-b border-border px-4 py-2">
-        {/* Filter tabs */}
-        <div className="flex items-center gap-1">
-          {filterTabs.map((tab) => (
-            <Link
-              key={tab.value}
-              from={Route.fullPath}
-              search={{ filter: tab.value }}
-              className={cn(
-                'rounded-md px-2.5 py-1 text-sm transition-colors',
-                filter === tab.value
-                  ? 'bg-surface-hover font-medium text-foreground'
-                  : 'text-muted hover:text-foreground',
-              )}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
-
-        {/* Add */}
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? 'Cancel' : '+ Add'}
-        </Button>
-      </div>
+      <TasksToolbar filter={filter} />
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
-        {showForm && (
-          <div className="border-b border-border p-4">
-            <TaskCreateForm
-              onCancel={() => setShowForm(false)}
-              onSuccess={() => setShowForm(false)}
-            />
-          </div>
-        )}
-
         {filteredTasks.length === 0 && (
           <p className="py-12 text-center text-sm text-muted">
             {filter === 'all' ? 'No tasks yet' : 'No matching tasks'}

@@ -12,12 +12,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@toolkit/ui'
 import { useState } from 'react'
 import CheckIcon from '../../assets/svg/actions/check.svg?react'
-import EditIcon from '../../assets/svg/actions/edit.svg?react'
 import MoreVerticalIcon from '../../assets/svg/actions/more-vertical.svg?react'
 import TrashIcon from '../../assets/svg/actions/trash.svg?react'
 import { useDeleteTask, useUpdateTask } from '../../hooks/useTasks'
@@ -25,7 +23,6 @@ import type { Task, WorkflowState } from '../../lib/api'
 import { priorityLabels } from '../../lib/priority'
 import { PriorityIcon } from './PriorityIcon'
 import { StatusIcon } from './StatusIcon'
-import { TaskEditForm } from './TaskEditForm'
 
 interface TaskItemProps {
   task: Task
@@ -34,7 +31,6 @@ interface TaskItemProps {
 }
 
 export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
-  const [isEditing, setIsEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showStatusMenu, setShowStatusMenu] = useState(false)
   const [showPriorityMenu, setShowPriorityMenu] = useState(false)
@@ -59,17 +55,6 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
     deleteTask.mutate(task.id, {
       onSuccess: () => setShowDeleteDialog(false),
     })
-  }
-
-  if (isEditing) {
-    return (
-      <TaskEditForm
-        task={task}
-        workflowStates={workflowStates}
-        onCancel={() => setIsEditing(false)}
-        onSuccess={() => setIsEditing(false)}
-      />
-    )
   }
 
   return (
@@ -158,14 +143,6 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-45">
-            <DropdownMenuItem
-              onSelect={() => setIsEditing(true)}
-              className="gap-2"
-            >
-              <EditIcon width={14} height={14} />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem
               isDestructive
               onSelect={() => setShowDeleteDialog(true)}

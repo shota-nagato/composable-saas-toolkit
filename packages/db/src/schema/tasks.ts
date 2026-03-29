@@ -2,17 +2,20 @@ import { sql } from 'drizzle-orm'
 import { check, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { commonColumns } from './common'
 
-/** CHECK 制約用の IN リスト。値はパラメータ化される（sql.raw 不使用） */
+/**
+ * CHECK 制約用の IN リスト。
+ * libSQL は CHECK 制約内のパラメータ（?）を禁止するため sql.raw を使用。
+ * 安全性: 引数はコード内定数配列（workflowStateTypes / taskPriorityValues）のみ。
+ * ユーザー入力は絶対に渡さないこと。
+ */
 const sqlInList = (values: readonly string[]) =>
-  sql.join(
-    values.map((v) => sql`${v}`),
-    sql`, `,
-  )
+  sql.raw(values.map((v) => `'${v}'`).join(', '))
 
 export const workflowStateTypes = [
   'backlog',
   'unstarted',
   'started',
+  'in_review',
   'completed',
   'canceled',
 ] as const

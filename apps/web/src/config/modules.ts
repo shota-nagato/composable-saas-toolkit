@@ -1,6 +1,4 @@
-import BoardIcon from '../assets/svg/modules/board.svg?react'
 import DocsIcon from '../assets/svg/modules/docs.svg?react'
-import ListIcon from '../assets/svg/modules/list.svg?react'
 import SettingsIcon from '../assets/svg/modules/settings.svg?react'
 import TasksIcon from '../assets/svg/modules/tasks.svg?react'
 
@@ -24,10 +22,7 @@ export const modules: ModuleConfig[] = [
     label: 'Tasks',
     icon: TasksIcon,
     basePath: '/tasks',
-    sidebarItems: [
-      { label: 'List', path: '/tasks', icon: ListIcon },
-      { label: 'Board', path: '/tasks/board', icon: BoardIcon },
-    ],
+    sidebarItems: [],
   },
   {
     id: 'docs',

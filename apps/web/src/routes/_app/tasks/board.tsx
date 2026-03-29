@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
 import { BoardColumn } from '../../../features/tasks/BoardColumn'
+import { TasksToolbar } from '../../../features/tasks/TasksToolbar'
 import { useTasks } from '../../../hooks/useTasks'
 import { useWorkflowStates } from '../../../hooks/useWorkflowStates'
 
@@ -26,15 +27,19 @@ function TaskBoardPage() {
   }
 
   return (
-    <div className="flex h-full overflow-x-auto p-4 gap-4">
-      {columns.map((col) => (
-        <BoardColumn
-          key={col.state.id}
-          state={col.state}
-          tasks={col.tasks}
-          workflowStates={workflowStates ?? []}
-        />
-      ))}
+    <div className="flex h-full flex-col">
+      <TasksToolbar />
+
+      <div className="flex flex-1 overflow-x-auto p-4 gap-4">
+        {columns.map((col) => (
+          <BoardColumn
+            key={col.state.id}
+            state={col.state}
+            tasks={col.tasks}
+            workflowStates={workflowStates ?? []}
+          />
+        ))}
+      </div>
     </div>
   )
 }
