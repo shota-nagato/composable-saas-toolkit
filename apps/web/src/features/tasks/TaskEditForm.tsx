@@ -62,7 +62,7 @@ export function TaskEditForm({
     <li>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4 rounded-lg border border-border-focus bg-surface p-4"
+        className="space-y-4 rounded-md border border-border bg-surface p-4 shadow-sm"
       >
         <div className="space-y-1.5">
           <Label htmlFor={`edit-title-${task.id}`}>Title</Label>

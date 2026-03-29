@@ -21,7 +21,7 @@ function TaskDetailPage() {
     return (
       <div className="p-6">
         <p className="text-muted">Task not found</p>
-        <Link to="/" className="mt-2 inline-block text-sm text-primary">
+        <Link to="/tasks" className="mt-2 inline-block text-sm text-primary">
           Back to tasks
         </Link>
       </div>
@@ -33,7 +33,7 @@ function TaskDetailPage() {
   return (
     <div className="mx-auto max-w-2xl p-6">
       <div className="mb-4">
-        <Link to="/">
+        <Link to="/tasks">
           <Button variant="ghost" size="sm">
             &larr; Back
           </Button>

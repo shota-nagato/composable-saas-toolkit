@@ -1,3 +1,5 @@
+export type { AvatarProps } from './components/avatar'
+export { Avatar } from './components/avatar'
 export type { BadgeProps } from './components/badge'
 export { Badge } from './components/badge'
 export type { ButtonProps } from './components/button'
@@ -47,7 +49,19 @@ export {
   SelectTrigger,
   SelectValue,
 } from './components/select'
+export {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from './components/sheet'
 export type { TextareaProps } from './components/textarea'
 export { Textarea } from './components/textarea'
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from './components/tooltip'
 
 export { cn } from './lib/utils'
