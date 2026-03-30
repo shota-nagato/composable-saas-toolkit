@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { PageLoading } from '../../components/PageLoading'
 import { DashboardHeader } from '../../features/dashboard/DashboardHeader'
 import { PriorityBreakdown } from '../../features/dashboard/PriorityBreakdown'
 import { RecentTasksList } from '../../features/dashboard/RecentTasksList'
@@ -17,7 +18,7 @@ function DashboardPage() {
   const { data: workflowStates, isLoading: statesLoading } = useWorkflowStates()
 
   if (tasksLoading || statesLoading) {
-    return <p className="p-6 text-sm text-muted">Loading...</p>
+    return <PageLoading />
   }
 
   const resolvedTasks = tasks ?? []

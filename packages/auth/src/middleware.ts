@@ -25,7 +25,7 @@ export const authMiddleware = () =>
     })
 
     if (!session) {
-      return c.json({ error: '認証が必要です' }, 401)
+      return c.json({ error: 'Authentication required' }, 401)
     }
 
     c.set('user', session.user)

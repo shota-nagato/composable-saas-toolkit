@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
+import { PageLoading } from '../../../components/PageLoading'
 import { BoardColumn } from '../../../features/tasks/BoardColumn'
 import { TasksToolbar } from '../../../features/tasks/TasksToolbar'
 import { useTasks } from '../../../hooks/useTasks'
@@ -23,7 +24,7 @@ function TaskBoardPage() {
   }, [tasks, workflowStates])
 
   if (tasksLoading || statesLoading) {
-    return <p className="p-6 text-sm text-muted">Loading...</p>
+    return <PageLoading />
   }
 
   return (

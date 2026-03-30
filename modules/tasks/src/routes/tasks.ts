@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
-import { tasks } from '@toolkit/db'
+import { tasks, workflowStates } from '@toolkit/db'
 import { eq } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 import { factory } from '../factory'
@@ -15,6 +15,14 @@ const app = factory
   .post('/', zValidator('json', createTaskSchema), async (c) => {
     const db = c.get('db')
     const body = c.req.valid('json')
+
+    const [state] = await db
+      .select()
+      .from(workflowStates)
+      .where(eq(workflowStates.id, body.stateId))
+    if (!state) {
+      throw new HTTPException(400, { message: 'Invalid stateId' })
+    }
 
     const id = crypto.randomUUID()
     await db.insert(tasks).values({
@@ -50,7 +58,10 @@ const app = factory
   .delete('/:id', async (c) => {
     const db = c.get('db')
     const id = c.req.param('id')
-    await db.delete(tasks).where(eq(tasks.id, id))
+    const deleted = await db.delete(tasks).where(eq(tasks.id, id)).returning()
+    if (deleted.length === 0) {
+      throw new HTTPException(404, { message: 'Task not found' })
+    }
     return c.body(null, 204)
   })
 

@@ -9,8 +9,9 @@ import {
   RichTextEditor,
 } from '@toolkit/ui'
 import DOMPurify from 'dompurify'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import CheckIcon from '../../../assets/svg/actions/check.svg?react'
+import { PageLoading } from '../../../components/PageLoading'
 import { PriorityIcon } from '../../../features/tasks/PriorityIcon'
 import { StatusIcon } from '../../../features/tasks/StatusIcon'
 import { useTask, useUpdateTask } from '../../../hooks/useTasks'
@@ -29,7 +30,7 @@ function TaskDetailPage() {
   const updateTask = useUpdateTask()
 
   if (taskLoading || statesLoading) {
-    return <p className="p-6 text-sm text-muted">Loading...</p>
+    return <PageLoading />
   }
 
   if (!task) {
@@ -253,6 +254,7 @@ function EditableDescription({
   const [isEditing, setIsEditing] = useState(false)
   const draftRef = useRef(value)
   const valueAtEditStartRef = useRef(value)
+  const sanitizedValue = useMemo(() => DOMPurify.sanitize(value), [value])
 
   function handleStartEdit() {
     draftRef.current = value
@@ -301,7 +303,7 @@ function EditableDescription({
       type="button"
       onClick={handleStartEdit}
       className="tiptap-content w-full cursor-text text-left text-sm leading-relaxed text-foreground hover:text-foreground/80"
-      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) }}
+      dangerouslySetInnerHTML={{ __html: sanitizedValue }}
     />
   )
 }

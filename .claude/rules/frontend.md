@@ -33,5 +33,6 @@ paths:
 src/
   lib/          → API client, type registry (api.ts)
   hooks/        → TanStack Query hooks (one per resource)
-  features/     → Feature-specific components
+  features/     → Feature-specific components (scoped to a domain)
+  components/   → Shared presentational components (layout, loading states, etc.)
 ```

@@ -3,6 +3,7 @@ import type { taskPriorityValues } from '@toolkit/db'
 import { cn } from '@toolkit/ui'
 import { useMemo, useState } from 'react'
 import ChevronDownIcon from '../../../assets/svg/actions/chevron-down.svg?react'
+import { PageLoading } from '../../../components/PageLoading'
 import { StatusIcon } from '../../../features/tasks/StatusIcon'
 import { TaskItem } from '../../../features/tasks/TaskItem'
 import { TasksToolbar } from '../../../features/tasks/TasksToolbar'
@@ -105,7 +106,7 @@ function TaskListPage() {
   }
 
   if (tasksLoading || statesLoading) {
-    return <p className="p-6 text-sm text-muted">Loading...</p>
+    return <PageLoading />
   }
 
   return (
