@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { taskPriorityValues } from '@toolkit/db'
 import {
   Button,
   Dialog,
@@ -15,14 +14,14 @@ import {
   DropdownMenuTrigger,
 } from '@toolkit/ui'
 import { useState } from 'react'
-import CheckIcon from '../../assets/svg/actions/check.svg?react'
 import MoreVerticalIcon from '../../assets/svg/actions/more-vertical.svg?react'
 import TrashIcon from '../../assets/svg/actions/trash.svg?react'
 import { useDeleteTask, useUpdateTask } from '../../hooks/useTasks'
 import type { Task, WorkflowState } from '../../lib/api'
-import { priorityLabels } from '../../lib/priority'
 import { PriorityIcon } from './PriorityIcon'
+import { PriorityPicker } from './PriorityPicker'
 import { StatusIcon } from './StatusIcon'
+import { StatusPicker } from './StatusPicker'
 
 interface TaskItemProps {
   task: Task
@@ -32,8 +31,6 @@ interface TaskItemProps {
 
 export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [showStatusMenu, setShowStatusMenu] = useState(false)
-  const [showPriorityMenu, setShowPriorityMenu] = useState(false)
   const updateTask = useUpdateTask()
   const deleteTask = useDeleteTask()
 
@@ -41,14 +38,10 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
 
   function handleStatusChange(stateId: string) {
     updateTask.mutate({ id: task.id, stateId })
-    setShowStatusMenu(false)
   }
 
   function handlePriorityChange(priority: Task['priority']) {
-    updateTask.mutate(
-      { id: task.id, priority },
-      { onSettled: () => setShowPriorityMenu(false) },
-    )
+    updateTask.mutate({ id: task.id, priority })
   }
 
   function handleDelete() {
@@ -61,34 +54,14 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
     <>
       <li className="group flex items-center gap-2.5 rounded-md px-3 py-1.5 transition-colors hover:bg-surface-hover">
         {/* Priority — click to open priority picker */}
-        <DropdownMenu
-          open={showPriorityMenu}
-          onOpenChange={setShowPriorityMenu}
-        >
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="shrink-0 rounded p-0.5 transition-colors hover:bg-surface-active"
-            >
-              <PriorityIcon priority={task.priority} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-44">
-            {taskPriorityValues.map((p) => (
-              <DropdownMenuItem
-                key={p}
-                onSelect={() => handlePriorityChange(p)}
-                className="gap-2.5"
-              >
-                <PriorityIcon priority={p} />
-                <span className="flex-1">{priorityLabels[p]}</span>
-                {p === task.priority && (
-                  <CheckIcon className="text-primary" width={14} height={14} />
-                )}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <PriorityPicker value={task.priority} onSelect={handlePriorityChange}>
+          <button
+            type="button"
+            className="shrink-0 rounded p-0.5 transition-colors hover:bg-surface-active"
+          >
+            <PriorityIcon priority={task.priority} />
+          </button>
+        </PriorityPicker>
 
         {/* Display ID */}
         {displayId && (
@@ -96,31 +69,18 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
         )}
 
         {/* Status icon — click to open status picker */}
-        <DropdownMenu open={showStatusMenu} onOpenChange={setShowStatusMenu}>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="shrink-0 rounded p-0.5 transition-colors hover:bg-surface-active"
-            >
-              <StatusIcon type={currentState?.type ?? 'unstarted'} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-50">
-            {workflowStates.map((state) => (
-              <DropdownMenuItem
-                key={state.id}
-                onSelect={() => handleStatusChange(state.id)}
-                className="gap-2.5"
-              >
-                <StatusIcon type={state.type} />
-                <span className="flex-1">{state.name}</span>
-                {state.id === task.stateId && (
-                  <CheckIcon className="text-primary" width={14} height={14} />
-                )}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <StatusPicker
+          workflowStates={workflowStates}
+          value={task.stateId}
+          onSelect={handleStatusChange}
+        >
+          <button
+            type="button"
+            className="shrink-0 rounded p-0.5 transition-colors hover:bg-surface-active"
+          >
+            <StatusIcon type={currentState?.type ?? 'unstarted'} />
+          </button>
+        </StatusPicker>
 
         {/* Title — click to navigate to detail */}
         <Link

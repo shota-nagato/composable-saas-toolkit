@@ -1,19 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { taskPriorityValues } from '@toolkit/db'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  isEmptyHtml,
-  RichTextEditor,
-} from '@toolkit/ui'
+import { isEmptyHtml, RichTextEditor } from '@toolkit/ui'
 import DOMPurify from 'dompurify'
 import { useCallback, useMemo, useRef, useState } from 'react'
-import CheckIcon from '../../../assets/svg/actions/check.svg?react'
 import { PageLoading } from '../../../components/PageLoading'
 import { PriorityIcon } from '../../../features/tasks/PriorityIcon'
+import { PriorityPicker } from '../../../features/tasks/PriorityPicker'
 import { StatusIcon } from '../../../features/tasks/StatusIcon'
+import { StatusPicker } from '../../../features/tasks/StatusPicker'
 import { useTask, useUpdateTask } from '../../../hooks/useTasks'
 import { useWorkflowStates } from '../../../hooks/useWorkflowStates'
 import { formatDate } from '../../../lib/format'
@@ -98,78 +91,41 @@ function TaskDetailPage() {
 
         {/* Status */}
         <div className="mb-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-surface-hover"
-              >
-                <StatusIcon type={currentState?.type ?? 'unstarted'} />
-                <span className="text-foreground">
-                  {currentState?.name ?? 'Unknown'}
-                </span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-50">
-              {workflowStates?.map((state) => (
-                <DropdownMenuItem
-                  key={state.id}
-                  onSelect={() =>
-                    updateTask.mutate({ id: task.id, stateId: state.id })
-                  }
-                  className="gap-2.5"
-                >
-                  <StatusIcon type={state.type} />
-                  <span className="flex-1">{state.name}</span>
-                  {state.id === task.stateId && (
-                    <CheckIcon
-                      className="text-primary"
-                      width={14}
-                      height={14}
-                    />
-                  )}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <StatusPicker
+            workflowStates={workflowStates ?? []}
+            value={task.stateId}
+            onSelect={(stateId) => updateTask.mutate({ id: task.id, stateId })}
+          >
+            <button
+              type="button"
+              className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-surface-hover"
+            >
+              <StatusIcon type={currentState?.type ?? 'unstarted'} />
+              <span className="text-foreground">
+                {currentState?.name ?? 'Unknown'}
+              </span>
+            </button>
+          </StatusPicker>
         </div>
 
         {/* Priority */}
         <div className="mb-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-surface-hover"
-              >
-                <PriorityIcon priority={task.priority} />
-                <span className="text-foreground">
-                  {priorityLabels[task.priority]}
-                </span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-44">
-              {taskPriorityValues.map((p) => (
-                <DropdownMenuItem
-                  key={p}
-                  onSelect={() =>
-                    updateTask.mutate({ id: task.id, priority: p })
-                  }
-                  className="gap-2.5"
-                >
-                  <PriorityIcon priority={p} />
-                  <span className="flex-1">{priorityLabels[p]}</span>
-                  {p === task.priority && (
-                    <CheckIcon
-                      className="text-primary"
-                      width={14}
-                      height={14}
-                    />
-                  )}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <PriorityPicker
+            value={task.priority}
+            onSelect={(priority) =>
+              updateTask.mutate({ id: task.id, priority })
+            }
+          >
+            <button
+              type="button"
+              className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-surface-hover"
+            >
+              <PriorityIcon priority={task.priority} />
+              <span className="text-foreground">
+                {priorityLabels[task.priority]}
+              </span>
+            </button>
+          </PriorityPicker>
         </div>
 
         {/* Timestamps */}
