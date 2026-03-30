@@ -13,7 +13,7 @@ import {
   RichTextEditor,
 } from '@toolkit/ui'
 import { useEffect } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import CheckIcon from '../../assets/svg/actions/check.svg?react'
 import { useCreateTask } from '../../hooks/useTasks'
 import { useWorkflowStates } from '../../hooks/useWorkflowStates'
@@ -42,7 +42,6 @@ export function TaskCreateDialog({
     handleSubmit,
     control,
     reset,
-    watch,
     setValue,
     formState: { isValid },
   } = useForm<CreateTaskInput>({
@@ -62,8 +61,9 @@ export function TaskCreateDialog({
     }
   }, [defaultStateId, setValue])
 
-  const currentStateId = watch('stateId')
-  const currentPriority = watch('priority') ?? 'no_priority'
+  const currentStateId = useWatch({ control, name: 'stateId' })
+  const currentPriority =
+    useWatch({ control, name: 'priority' }) ?? 'no_priority'
   const currentState = workflowStates?.find((s) => s.id === currentStateId)
 
   function onSubmit(data: CreateTaskInput) {
