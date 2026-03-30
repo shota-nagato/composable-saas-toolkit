@@ -363,6 +363,8 @@ importers:
         specifier: 'catalog:'
         version: 4.12.5
 
+  packages/tsconfig: {}
+
   packages/ui:
     dependencies:
       '@radix-ui/react-dialog':
