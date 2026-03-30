@@ -96,7 +96,7 @@ export function TaskItem({ task, workflowStates, displayId }: TaskItemProps) {
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="shrink-0 rounded p-1 opacity-0 transition-opacity hover:bg-surface-active group-hover:opacity-100"
+              className="shrink-0 rounded p-1 opacity-0 transition-opacity hover:bg-surface-active group-hover:opacity-100 focus-visible:opacity-100"
             >
               <MoreVerticalIcon />
               <span className="sr-only">Actions</span>
