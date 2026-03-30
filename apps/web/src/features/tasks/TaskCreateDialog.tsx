@@ -12,7 +12,7 @@ import {
   isEmptyHtml,
   RichTextEditor,
 } from '@toolkit/ui'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import CheckIcon from '../../assets/svg/actions/check.svg?react'
 import { useCreateTask } from '../../hooks/useTasks'
@@ -34,7 +34,8 @@ export function TaskCreateDialog({
 }: TaskCreateDialogProps) {
   const { data: workflowStates } = useWorkflowStates()
   const createTask = useCreateTask()
-  const _titleRef = useRef<HTMLInputElement | null>(null)
+  const titleRef = useRef<HTMLInputElement | null>(null)
+  const [editorInert, setEditorInert] = useState(true)
 
   const defaultStateId = workflowStates?.[0]?.id ?? ''
 
@@ -57,6 +58,15 @@ export function TaskCreateDialog({
   })
 
   const titleRegister = register('title')
+
+  // inert を解除して Tiptap を操作可能にする（title にフォーカス後）
+  useEffect(() => {
+    if (open) {
+      setEditorInert(true)
+      const timer = setTimeout(() => setEditorInert(false), 150)
+      return () => clearTimeout(timer)
+    }
+  }, [open])
 
   useEffect(() => {
     if (defaultStateId) {
@@ -86,6 +96,7 @@ export function TaskCreateDialog({
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
+      setEditorInert(true)
       reset({
         title: '',
         description: null,
@@ -102,7 +113,7 @@ export function TaskCreateDialog({
         className="max-w-lg p-0"
         onOpenAutoFocus={(e) => {
           e.preventDefault()
-          _titleRef.current?.focus()
+          titleRef.current?.focus()
         }}
       >
         <DialogTitle className="sr-only">New Issue</DialogTitle>
@@ -119,13 +130,13 @@ export function TaskCreateDialog({
               {...titleRegister}
               ref={(el) => {
                 titleRegister.ref(el)
-                _titleRef.current = el
+                titleRef.current = el
               }}
             />
           </div>
 
-          {/* Description */}
-          <div className="px-5 pb-3">
+          {/* Description — inert until title is focused to prevent Tiptap from stealing focus */}
+          <div className="px-5 pb-3" inert={editorInert ? true : undefined}>
             <Controller
               name="description"
               control={control}
