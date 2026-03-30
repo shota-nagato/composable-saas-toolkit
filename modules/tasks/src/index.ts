@@ -7,19 +7,34 @@ import { factory } from './factory'
 import taskRoutes from './routes/tasks'
 import workflowStateRoutes from './routes/workflow-states'
 
+function parseTrustedOrigins(raw: string | undefined): string[] {
+  if (!raw) return []
+  return raw
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+}
+
 const app = factory.createApp()
 
-// CORS（dev: Vite proxy 経由でも OPTIONS preflight が飛ぶため必要）
-// TODO(production): origin を本番ドメインに制限する（現在は全オリジン反射）
-app.use(
-  '/api/*',
-  cors({
-    origin: (origin) => origin,
-    allowHeaders: ['Content-Type', 'Authorization', 'User-Agent'],
+// CORS — BETTER_AUTH_TRUSTED_ORIGINS と同じ許可リストを使用
+app.use('/api/*', async (c, next) => {
+  const allowedOrigins = parseTrustedOrigins(c.env.BETTER_AUTH_TRUSTED_ORIGINS)
+  if (allowedOrigins.length === 0) {
+    console.warn(
+      'BETTER_AUTH_TRUSTED_ORIGINS is not set — CORS will block all cross-origin requests',
+    )
+  }
+
+  const corsMiddleware = cors({
+    origin: allowedOrigins,
+    allowHeaders: ['Content-Type', 'Authorization'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
-  }),
-)
+    maxAge: 600,
+  })
+  return corsMiddleware(c, next)
+})
 
 // DB 接続（auth もこの DB を使う）
 app.use('*', singleTenantMiddleware())
@@ -28,13 +43,12 @@ app.use('*', singleTenantMiddleware())
 // auth handler と authMiddleware が同一設定のインスタンスを使う
 app.use('*', async (c, next) => {
   const db = c.get('db')
+  const trustedOrigins = parseTrustedOrigins(c.env.BETTER_AUTH_TRUSTED_ORIGINS)
   const auth = createAuth({
     db,
     baseUrl: c.env.BETTER_AUTH_URL,
     secret: c.env.BETTER_AUTH_SECRET,
-    trustedOrigins: c.env.BETTER_AUTH_TRUSTED_ORIGINS
-      ? c.env.BETTER_AUTH_TRUSTED_ORIGINS.split(',')
-      : [],
+    trustedOrigins,
     secureCookies: c.env.BETTER_AUTH_URL.startsWith('https://'),
   })
   c.set('auth', auth)
