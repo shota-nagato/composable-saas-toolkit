@@ -17,6 +17,7 @@
     "./avatar": "./src/components/avatar.tsx",
     "./rich-text-editor": "./src/components/rich-text-editor.tsx",
     "./sheet": "./src/components/sheet.tsx",
+    "./toast": "./src/components/toast.tsx",
     "./utils": "./src/lib/utils.ts"
   },
   "dependencies": {

@@ -59,6 +59,8 @@ export {
 } from './components/sheet'
 export type { TextareaProps } from './components/textarea'
 export { Textarea } from './components/textarea'
+export type { ToastVariant } from './components/toast'
+export { ToastProvider, useToast } from './components/toast'
 export {
   Tooltip,
   TooltipContent,

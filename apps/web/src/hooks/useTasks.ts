@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useToast } from '@toolkit/ui'
 import { DetailedError, parseResponse } from 'hono/client'
 import { type CreateTaskInput, client, type UpdateTaskInput } from '../lib/api'
 
@@ -24,13 +25,15 @@ export function useTask(id: string) {
 
 export function useCreateTask() {
   const qc = useQueryClient()
+  const { toast } = useToast()
   return useMutation({
     mutationFn: async (input: CreateTaskInput) =>
       parseResponse(client.api.tasks.$post({ json: input })),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: taskKeys.all })
+      toast('Task created', 'success')
     },
-    onError: handleMutationError,
+    onError: (error) => handleMutationError(error, toast),
   })
 }
 
@@ -45,12 +48,15 @@ export function useUpdateTask() {
       qc.invalidateQueries({ queryKey: taskKeys.all })
       qc.invalidateQueries({ queryKey: taskKeys.detail(id) })
     },
-    onError: handleMutationError,
+    onError: (error) => {
+      console.error('[API]', error.message)
+    },
   })
 }
 
 export function useDeleteTask() {
   const qc = useQueryClient()
+  const { toast } = useToast()
   return useMutation({
     mutationFn: async (id: string) => {
       await client.api.tasks[':id'].$delete({ param: { id } })
@@ -58,15 +64,24 @@ export function useDeleteTask() {
     onSuccess: (_, id) => {
       qc.invalidateQueries({ queryKey: taskKeys.all })
       qc.removeQueries({ queryKey: taskKeys.detail(id) })
+      toast('Task deleted')
     },
-    onError: handleMutationError,
+    onError: (error) => handleMutationError(error, toast),
   })
 }
 
-function handleMutationError(error: Error) {
+function handleMutationError(
+  error: Error,
+  toast: (
+    message: string,
+    variant?: 'default' | 'success' | 'destructive',
+  ) => void,
+) {
   if (error instanceof DetailedError) {
     console.error(`[API ${error.statusCode}]`, error.message, error.detail)
+    toast(error.message || 'An error occurred', 'destructive')
     return
   }
   console.error('[API]', error.message)
+  toast('An error occurred', 'destructive')
 }
