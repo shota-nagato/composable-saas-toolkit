@@ -10,5 +10,6 @@ export function useWorkflowStates() {
   return useQuery({
     queryKey: workflowStateKeys.all,
     queryFn: () => parseResponse(client.api['workflow-states'].$get()),
+    staleTime: 10 * 60 * 1000,
   })
 }

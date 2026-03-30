@@ -39,6 +39,7 @@ export function useCreateTask() {
 
 export function useUpdateTask() {
   const qc = useQueryClient()
+  const { toast } = useToast()
   return useMutation({
     mutationFn: ({ id, ...input }: { id: string } & UpdateTaskInput) =>
       parseResponse(
@@ -48,9 +49,7 @@ export function useUpdateTask() {
       qc.invalidateQueries({ queryKey: taskKeys.all })
       qc.invalidateQueries({ queryKey: taskKeys.detail(id) })
     },
-    onError: (error) => {
-      console.error('[API]', error.message)
-    },
+    onError: (error) => handleMutationError(error, toast),
   })
 }
 
@@ -59,7 +58,7 @@ export function useDeleteTask() {
   const { toast } = useToast()
   return useMutation({
     mutationFn: async (id: string) => {
-      await client.api.tasks[':id'].$delete({ param: { id } })
+      await parseResponse(client.api.tasks[':id'].$delete({ param: { id } }))
     },
     onSuccess: (_, id) => {
       qc.invalidateQueries({ queryKey: taskKeys.all })

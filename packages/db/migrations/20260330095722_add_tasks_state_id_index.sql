@@ -1,0 +1,1 @@
+CREATE INDEX `tasks_state_id_idx` ON `tasks` (`state_id`);

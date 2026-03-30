@@ -79,6 +79,8 @@ function SidebarToggle() {
         <button
           type="button"
           onClick={toggle}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
           className={cn(
             'absolute top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-opacity',
             isOpen

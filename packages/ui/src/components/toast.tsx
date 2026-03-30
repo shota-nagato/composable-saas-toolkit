@@ -83,9 +83,20 @@ function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext value={value}>
       {children}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 p-4 pb-20 lg:pb-4">
-        {toasts.map((t) => (
-          <ToastItem key={t.id} toast={t} onRemove={removeToast} />
-        ))}
+        <div role="status" aria-live="polite">
+          {toasts
+            .filter((t) => t.variant !== 'destructive')
+            .map((t) => (
+              <ToastItem key={t.id} toast={t} onRemove={removeToast} />
+            ))}
+        </div>
+        <div role="alert" aria-live="assertive">
+          {toasts
+            .filter((t) => t.variant === 'destructive')
+            .map((t) => (
+              <ToastItem key={t.id} toast={t} onRemove={removeToast} />
+            ))}
+        </div>
       </div>
     </ToastContext>
   )

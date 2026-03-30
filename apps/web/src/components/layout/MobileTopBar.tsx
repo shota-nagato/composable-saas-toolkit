@@ -19,6 +19,7 @@ export function MobileTopBar({ userName, userImage }: MobileTopBarProps) {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
+        aria-label="Open menu"
         className="flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-surface-hover hover:text-foreground"
       >
         <MenuIcon className="h-5 w-5" />

@@ -1,5 +1,11 @@
 import { sql } from 'drizzle-orm'
-import { check, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import {
+  check,
+  index,
+  integer,
+  sqliteTable,
+  text,
+} from 'drizzle-orm/sqlite-core'
 import { commonColumns } from './common'
 
 /**
@@ -63,6 +69,7 @@ export const tasks = sqliteTable(
       .default('no_priority'),
   },
   (table) => [
+    index('tasks_state_id_idx').on(table.stateId),
     check(
       'priority_check',
       sql`${table.priority} IN (${sqlInList(taskPriorityValues)})`,
