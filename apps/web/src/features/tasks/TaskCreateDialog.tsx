@@ -12,7 +12,7 @@ import {
   isEmptyHtml,
   RichTextEditor,
 } from '@toolkit/ui'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import CheckIcon from '../../assets/svg/actions/check.svg?react'
 import { useCreateTask } from '../../hooks/useTasks'
@@ -34,6 +34,7 @@ export function TaskCreateDialog({
 }: TaskCreateDialogProps) {
   const { data: workflowStates } = useWorkflowStates()
   const createTask = useCreateTask()
+  const _titleRef = useRef<HTMLInputElement | null>(null)
 
   const defaultStateId = workflowStates?.[0]?.id ?? ''
 
@@ -54,6 +55,8 @@ export function TaskCreateDialog({
     },
     mode: 'onChange',
   })
+
+  const titleRegister = register('title')
 
   useEffect(() => {
     if (defaultStateId) {
@@ -95,7 +98,13 @@ export function TaskCreateDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-lg p-0">
+      <DialogContent
+        className="max-w-lg p-0"
+        onOpenAutoFocus={(e) => {
+          e.preventDefault()
+          _titleRef.current?.focus()
+        }}
+      >
         <DialogTitle className="sr-only">New Issue</DialogTitle>
         <DialogDescription className="sr-only">
           Create a new task
@@ -106,9 +115,12 @@ export function TaskCreateDialog({
           <div className="px-5 pt-5">
             <Input
               placeholder="Issue title"
-              autoFocus
               className="border-none bg-transparent px-0 text-base font-medium shadow-none placeholder:text-muted focus-visible:ring-0"
-              {...register('title')}
+              {...titleRegister}
+              ref={(el) => {
+                titleRegister.ref(el)
+                _titleRef.current = el
+              }}
             />
           </div>
 
