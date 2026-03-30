@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "typecheck": "tsc -b",
+    "typecheck": "tsr generate && tsc -b",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -29,6 +29,7 @@
     "@eslint/js": "^9.39.1",
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-query-devtools": "^5.91.3",
+    "@tanstack/router-cli": "catalog:",
     "@tanstack/router-plugin": "catalog:",
     "@types/node": "^25.3.5",
     "@types/react": "catalog:",

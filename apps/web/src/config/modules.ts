@@ -1,3 +1,4 @@
+import DashboardIcon from '../assets/svg/modules/dashboard.svg?react'
 import DocsIcon from '../assets/svg/modules/docs.svg?react'
 import SettingsIcon from '../assets/svg/modules/settings.svg?react'
 import TasksIcon from '../assets/svg/modules/tasks.svg?react'
@@ -17,6 +18,13 @@ export interface ModuleConfig {
 }
 
 export const modules: ModuleConfig[] = [
+  {
+    id: 'dashboard',
+    label: 'Home',
+    icon: DashboardIcon,
+    basePath: '/',
+    sidebarItems: [],
+  },
   {
     id: 'tasks',
     label: 'Tasks',
@@ -41,5 +49,7 @@ export const settingsModule = {
 }
 
 export function getActiveModule(pathname: string): ModuleConfig | undefined {
-  return modules.find((m) => pathname.startsWith(m.basePath))
+  return modules.find((m) =>
+    m.basePath === '/' ? pathname === '/' : pathname.startsWith(m.basePath),
+  )
 }

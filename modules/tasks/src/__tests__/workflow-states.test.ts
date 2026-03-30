@@ -17,12 +17,12 @@ describe('Workflow States API', () => {
   })
 
   describe('GET /api/workflow-states', () => {
-    it('シードされた 5 つのステートを返す', async () => {
+    it('シードされた 6 つのステートを返す', async () => {
       const res = await app.request('/api/workflow-states')
 
       expect(res.status).toBe(200)
       const body = await jsonBody<WorkflowState[]>(res)
-      expect(body).toHaveLength(5)
+      expect(body).toHaveLength(6)
     })
 
     it('各ステートに必要なフィールドがある', async () => {
