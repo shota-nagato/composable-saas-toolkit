@@ -25,7 +25,7 @@ export function createTestApp() {
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),
       name TEXT NOT NULL,
-      type TEXT NOT NULL CHECK (type IN ('backlog', 'unstarted', 'started', 'completed', 'canceled')),
+      type TEXT NOT NULL CHECK (type IN ('backlog', 'unstarted', 'started', 'in_review', 'completed', 'canceled')),
       color TEXT,
       position INTEGER NOT NULL DEFAULT 0
     );
@@ -36,7 +36,8 @@ export function createTestApp() {
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),
       title TEXT NOT NULL,
       description TEXT,
-      state_id TEXT NOT NULL REFERENCES workflow_states(id)
+      state_id TEXT NOT NULL REFERENCES workflow_states(id),
+      priority TEXT NOT NULL DEFAULT 'no_priority' CHECK (priority IN ('urgent', 'high', 'medium', 'low', 'no_priority'))
     );
   `)
 
