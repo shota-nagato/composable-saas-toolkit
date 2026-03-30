@@ -28,11 +28,11 @@
     "npm": "pnpmを使ってください"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.6",
-    "@types/node": "^25.3.5",
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
     "concurrently": "catalog:",
-    "turbo": "^2.8.14",
-    "typescript": "^5.9.3"
+    "turbo": "catalog:",
+    "typescript": "catalog:"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
