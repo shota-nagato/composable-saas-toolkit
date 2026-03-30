@@ -3,7 +3,7 @@ export { Avatar } from './components/avatar'
 export type { BadgeProps } from './components/badge'
 export { Badge } from './components/badge'
 export type { ButtonProps } from './components/button'
-export { Button } from './components/button'
+export { Button, buttonVariants } from './components/button'
 
 export {
   Dialog,

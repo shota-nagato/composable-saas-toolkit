@@ -26,6 +26,16 @@ const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
   lg: 'h-10 px-6 text-base',
 }
 
+const baseClasses =
+  'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ring-offset'
+
+function buttonVariants(
+  variant: NonNullable<ButtonProps['variant']> = 'primary',
+  size: NonNullable<ButtonProps['size']> = 'md',
+) {
+  return cn(baseClasses, variantClasses[variant], sizeClasses[size])
+}
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -43,13 +53,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-md font-medium',
-          'transition-colors duration-150',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ring-offset',
+          buttonVariants(variant, size),
           'disabled:pointer-events-none disabled:opacity-50',
           'cursor-pointer',
-          variantClasses[variant],
-          sizeClasses[size],
           className,
         )}
         {...props}
@@ -63,4 +69,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = 'Button'
 
-export { Button }
+export { Button, buttonVariants }
