@@ -17,24 +17,27 @@ function parseTrustedOrigins(raw: string | undefined): string[] {
 
 const app = factory.createApp()
 
-// CORS — BETTER_AUTH_TRUSTED_ORIGINS と同じ許可リストを使用
-app.use('/api/*', async (c, next) => {
-  const allowedOrigins = parseTrustedOrigins(c.env.BETTER_AUTH_TRUSTED_ORIGINS)
-  if (allowedOrigins.length === 0) {
-    console.warn(
-      'BETTER_AUTH_TRUSTED_ORIGINS is not set — CORS will block all cross-origin requests',
-    )
-  }
-
-  const corsMiddleware = cors({
-    origin: allowedOrigins,
+// CORS — module scope で 1 回だけ生成。origin 関数内で env を読むため
+// Workers の env がリクエスト時にしか利用できない制約を回避。
+app.use(
+  '/api/*',
+  cors({
+    origin: (origin, c) => {
+      const allowed = parseTrustedOrigins(c.env.BETTER_AUTH_TRUSTED_ORIGINS)
+      if (allowed.length === 0) {
+        console.warn(
+          'BETTER_AUTH_TRUSTED_ORIGINS is not set — CORS will block all cross-origin requests',
+        )
+        return ''
+      }
+      return allowed.includes(origin) ? origin : ''
+    },
     allowHeaders: ['Content-Type', 'Authorization'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
     maxAge: 600,
-  })
-  return corsMiddleware(c, next)
-})
+  }),
+)
 
 // DB 接続（auth もこの DB を使う）
 app.use('*', singleTenantMiddleware())

@@ -45,6 +45,7 @@ const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorProps>(
         Link.configure({
           openOnClick: false,
           autolink: true,
+          HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' },
         }),
       ],
       content: content ?? '',
