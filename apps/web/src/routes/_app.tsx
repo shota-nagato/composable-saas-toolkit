@@ -9,6 +9,9 @@ export const Route = createFileRoute('/_app')({
     if (!session) {
       throw redirect({ to: '/login' })
     }
+    if (!session.session.activeOrganizationId) {
+      throw redirect({ to: '/org/select' })
+    }
     return { session }
   },
   component: AppLayout,
