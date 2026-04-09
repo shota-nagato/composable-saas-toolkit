@@ -1,19 +1,24 @@
 import { zValidator } from '@hono/zod-validator'
 import { tasks, workflowStates } from '@toolkit/db'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
-import { factory } from '../factory'
+import { orgFactory } from '../factory'
 import { createTaskSchema, updateTaskSchema } from '../schemas/tasks'
 
-const app = factory
+const app = orgFactory
   .createApp()
   .get('/', async (c) => {
     const db = c.get('db')
-    const allTasks = await db.select().from(tasks)
+    const orgId = c.get('organizationId')
+    const allTasks = await db
+      .select()
+      .from(tasks)
+      .where(eq(tasks.organizationId, orgId))
     return c.json(allTasks)
   })
   .post('/', zValidator('json', createTaskSchema), async (c) => {
     const db = c.get('db')
+    const orgId = c.get('organizationId')
     const body = c.req.valid('json')
 
     const [state] = await db
@@ -31,6 +36,7 @@ const app = factory
       description: body.description ?? null,
       stateId: body.stateId,
       priority: body.priority,
+      organizationId: orgId,
     })
 
     const [created] = await db.select().from(tasks).where(eq(tasks.id, id))
@@ -38,14 +44,19 @@ const app = factory
   })
   .get('/:id', async (c) => {
     const db = c.get('db')
+    const orgId = c.get('organizationId')
     const id = c.req.param('id')
-    const [task] = await db.select().from(tasks).where(eq(tasks.id, id))
+    const [task] = await db
+      .select()
+      .from(tasks)
+      .where(and(eq(tasks.id, id), eq(tasks.organizationId, orgId)))
 
     if (!task) throw new HTTPException(404, { message: 'Task not found' })
     return c.json(task)
   })
   .patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     const db = c.get('db')
+    const orgId = c.get('organizationId')
     const id = c.req.param('id')
     const body = c.req.valid('json')
 
@@ -59,16 +70,26 @@ const app = factory
       }
     }
 
-    await db.update(tasks).set(body).where(eq(tasks.id, id))
+    await db
+      .update(tasks)
+      .set(body)
+      .where(and(eq(tasks.id, id), eq(tasks.organizationId, orgId)))
 
-    const [updated] = await db.select().from(tasks).where(eq(tasks.id, id))
+    const [updated] = await db
+      .select()
+      .from(tasks)
+      .where(and(eq(tasks.id, id), eq(tasks.organizationId, orgId)))
     if (!updated) throw new HTTPException(404, { message: 'Task not found' })
     return c.json(updated)
   })
   .delete('/:id', async (c) => {
     const db = c.get('db')
+    const orgId = c.get('organizationId')
     const id = c.req.param('id')
-    const deleted = await db.delete(tasks).where(eq(tasks.id, id)).returning()
+    const deleted = await db
+      .delete(tasks)
+      .where(and(eq(tasks.id, id), eq(tasks.organizationId, orgId)))
+      .returning()
     if (deleted.length === 0) {
       throw new HTTPException(404, { message: 'Task not found' })
     }

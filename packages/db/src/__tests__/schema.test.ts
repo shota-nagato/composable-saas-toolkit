@@ -67,12 +67,20 @@ describe('tasks schema', () => {
       .insert(workflowStates)
       .values({ id: 'ws-todo', name: 'Todo', type: 'unstarted' })
       .run()
+    ctx.raw.exec(
+      `INSERT INTO organizations (id, name, slug, created_at) VALUES ('org-1', 'Test Org', 'test-org', 0)`,
+    )
   })
 
   it('inserts a task with default priority = no_priority', () => {
     ctx.db
       .insert(tasks)
-      .values({ id: 't-1', title: 'Test', stateId: 'ws-todo' })
+      .values({
+        id: 't-1',
+        title: 'Test',
+        stateId: 'ws-todo',
+        organizationId: 'org-1',
+      })
       .run()
 
     const row = ctx.db.select().from(tasks).where(eq(tasks.id, 't-1')).get()
@@ -81,6 +89,7 @@ describe('tasks schema', () => {
       title: 'Test',
       stateId: 'ws-todo',
       priority: 'no_priority',
+      organizationId: 'org-1',
       description: null,
     })
   })
@@ -102,6 +111,7 @@ describe('tasks schema', () => {
           title: priority,
           stateId: 'ws-todo',
           priority,
+          organizationId: 'org-1',
         })
         .run()
     }
@@ -113,7 +123,7 @@ describe('tasks schema', () => {
   it('rejects a task with an invalid priority (CHECK constraint)', () => {
     expect(() =>
       ctx.raw.exec(
-        `INSERT INTO tasks (id, title, state_id, priority) VALUES ('t-x', 'Bad', 'ws-todo', 'critical')`,
+        `INSERT INTO tasks (id, title, state_id, priority, organization_id) VALUES ('t-x', 'Bad', 'ws-todo', 'critical', 'org-1')`,
       ),
     ).toThrow(/CHECK constraint failed/i)
   })
@@ -122,7 +132,12 @@ describe('tasks schema', () => {
     expect(() =>
       ctx.db
         .insert(tasks)
-        .values({ id: 't-y', title: 'Orphan', stateId: 'ws-missing' })
+        .values({
+          id: 't-y',
+          title: 'Orphan',
+          stateId: 'ws-missing',
+          organizationId: 'org-1',
+        })
         .run(),
     ).toThrow(/FOREIGN KEY constraint failed/i)
   })
@@ -134,6 +149,17 @@ describe('tasks schema', () => {
       )
       .all() as { name: string }[]
     expect(indexes.some((i) => i.name === 'tasks_state_id_idx')).toBe(true)
+  })
+
+  it('has an index on tasks.organization_id', () => {
+    const indexes = ctx.raw
+      .prepare(
+        `SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'tasks'`,
+      )
+      .all() as { name: string }[]
+    expect(indexes.some((i) => i.name === 'tasks_organization_id_idx')).toBe(
+      true,
+    )
   })
 })
 

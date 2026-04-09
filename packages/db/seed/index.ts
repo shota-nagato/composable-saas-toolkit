@@ -1,7 +1,8 @@
 import 'dotenv/config'
 import { createClient } from '@libsql/client'
 import { drizzle } from 'drizzle-orm/libsql'
-import { workflowStates } from '../src/schema'
+import { organizations, workflowStates } from '../src/schema'
+import { defaultOrganization } from './default-organization'
 import { defaultWorkflowStates } from './default-workflow-states'
 
 const main = async () => {
@@ -15,6 +16,12 @@ const main = async () => {
   await db
     .insert(workflowStates)
     .values(defaultWorkflowStates)
+    .onConflictDoNothing()
+
+  console.log('Seeding default organization...')
+  await db
+    .insert(organizations)
+    .values(defaultOrganization)
     .onConflictDoNothing()
 
   console.log('Done.')

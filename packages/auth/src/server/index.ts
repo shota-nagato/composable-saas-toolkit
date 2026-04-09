@@ -2,7 +2,7 @@ import type { Database } from '@toolkit/db'
 import * as schema from '@toolkit/db/schema'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { admin } from 'better-auth/plugins'
+import { admin, organization } from 'better-auth/plugins'
 import { BASE_PATH } from '../constants'
 
 export { BASE_PATH }
@@ -50,7 +50,24 @@ export const createAuth = ({
       enabled: true,
       requireEmailVerification: false, // TODO(production): true に変更 + emailSender 注入
     },
-    plugins: [admin()],
+    plugins: [
+      admin(),
+      organization({
+        allowUserToCreateOrganization: true,
+        organizationLimit: 5,
+        membershipLimit: 50,
+        invitationExpiresIn: 48 * 60 * 60, // 48h
+        creatorRole: 'owner',
+        sendInvitationEmail: async (data) => {
+          // TODO(production): Resend/SendGrid 等で実メール送信
+          console.log('[auth] invitation email:', {
+            to: data.email,
+            orgName: data.organization.name,
+            invitationId: data.id,
+          })
+        },
+      }),
+    ],
     trustedOrigins: trustedOrigins ?? [], // TODO(production): フロントエンド URL を必ず含める
     advanced: {
       cookiePrefix: 'toolkit',

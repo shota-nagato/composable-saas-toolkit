@@ -3,19 +3,12 @@ import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { defaultWorkflowStates } from '../../../../packages/db/seed/default-workflow-states'
-import type { Env } from '../env'
+import type { OrgEnv } from '../env'
 import taskRoutes from '../routes/tasks'
 import workflowStateRoutes from '../routes/workflow-states'
 
-/**
- * テスト用アプリを作成する
- *
- * - in-memory SQLite でDBを作成
- * - DDL でスキーマを作成
- * - デフォルトのワークフローステートをシード
- * - テナントミドルウェアをモックに差し替え
- */
-export function createTestApp() {
+/** in-memory DB + DDL + シード。複数 app で共有可能 */
+function createTestDb() {
   const sqlite = new Database(':memory:')
   const db = drizzle(sqlite)
 
@@ -37,12 +30,14 @@ export function createTestApp() {
       title TEXT NOT NULL,
       description TEXT,
       state_id TEXT NOT NULL REFERENCES workflow_states(id),
-      priority TEXT NOT NULL DEFAULT 'no_priority' CHECK (priority IN ('urgent', 'high', 'medium', 'low', 'no_priority'))
+      priority TEXT NOT NULL DEFAULT 'no_priority' CHECK (priority IN ('urgent', 'high', 'medium', 'low', 'no_priority')),
+      organization_id TEXT NOT NULL
     );
+
+    CREATE INDEX tasks_state_id_idx ON tasks (state_id);
+    CREATE INDEX tasks_organization_id_idx ON tasks (organization_id);
   `)
 
-  // seed — better-sqlite3 の prepared statement で直接挿入
-  // drizzle-orm の sql タグは pnpm の重複インスタンス問題で型が合わないため使わない
   const insert = sqlite.prepare(
     'INSERT INTO workflow_states (id, name, type, color, position) VALUES (?, ?, ?, ?, ?)',
   )
@@ -50,19 +45,21 @@ export function createTestApp() {
     insert.run(state.id, state.name, state.type, state.color, state.position)
   }
 
-  const app = new Hono<Env>()
+  return { sqlite, db }
+}
 
-  // テナントミドルウェアのモック
-  // BetterSQLite3Database と LibSQLDatabase は Drizzle のクエリビルダーAPI が互換のため
-  // ランタイムでは問題なく動作する。型の不一致は as any で許容。
+/** 指定 organizationId でリクエストする Hono app を作成 */
+function buildApp(db: ReturnType<typeof drizzle>, organizationId: string) {
+  const app = new Hono<OrgEnv>()
+
   app.use('*', async (c, next) => {
     // biome-ignore lint/suspicious/noExplicitAny: BetterSQLite3Database → LibSQLDatabase の型差異を許容
     c.set('db', db as any)
     c.set('tenantId', 'test-tenant')
+    c.set('organizationId', organizationId)
     await next()
   })
 
-  // エラーハンドラー（本番と同じ）
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
       if (err.res) return err.getResponse()
@@ -75,7 +72,31 @@ export function createTestApp() {
   app.route('/api/tasks', taskRoutes)
   app.route('/api/workflow-states', workflowStateRoutes)
 
+  return app
+}
+
+/**
+ * テスト用アプリを作成する（既存テスト互換）
+ *
+ * - in-memory SQLite でDBを作成
+ * - DDL でスキーマを作成
+ * - デフォルトのワークフローステートをシード
+ * - テナント + org ミドルウェアをモックに差し替え
+ */
+export function createTestApp() {
+  const { db } = createTestDb()
+  const app = buildApp(db, 'test-org')
   return { app, db }
+}
+
+/**
+ * クロス org 分離テスト用：同一 DB を共有する 2 つの app を作成
+ */
+export function createMultiOrgTestApps() {
+  const { db } = createTestDb()
+  const appOrgA = buildApp(db, 'org-a')
+  const appOrgB = buildApp(db, 'org-b')
+  return { appOrgA, appOrgB, db }
 }
 
 /** レスポンスボディを型付きで取得 */

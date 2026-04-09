@@ -32,6 +32,36 @@ app.on(['GET', 'POST'], '/api/auth/**', async (c) => {
 app.use('/api/{resource}/*', authMiddleware())  // 認証必須ルート
 ```
 
+## Organization Scoped Routes (OrgVariables / OrgEnv)
+
+Organization スコープのルートでは `AuthVariables` と `OrgVariables` を分離して型安全性を確保する。
+
+- `AuthVariables`: `user`, `session`, `auth` — authMiddleware が設定
+- `OrgVariables`: `organizationId` — orgGuardMiddleware が設定
+- `orgGuardMiddleware` 未適用のルート（workflow-states 等）で `c.get('organizationId')` はコンパイルエラーになる
+
+```typescript
+// modules/{name}/src/env.ts
+export type Env = {
+  Bindings: SingleTenantBindings & AuthBindings
+  Variables: TenantVariables & AuthVariables
+}
+export type OrgEnv = {
+  Bindings: Env['Bindings']
+  Variables: Env['Variables'] & OrgVariables
+}
+
+// modules/{name}/src/factory.ts
+export const factory = createFactory<Env>()         // auth のみ
+export const orgFactory = createFactory<OrgEnv>()   // auth + org
+
+// modules/{name}/src/index.ts
+app.use('/api/tasks/*', authMiddleware())
+app.use('/api/tasks/*', orgGuardMiddleware())  // authMiddleware の後に適用
+```
+
+Organization スコープのルートファイルでは `orgFactory.createApp()` を使用する。
+
 ## Auth Client (Frontend)
 - `better-auth/react` を使用（`useSession` フックが必要）
 - `better-auth/client` は使わない（React フック未提供）

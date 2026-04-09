@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
+  createMultiOrgTestApps,
   createTestApp,
   deleteRequest,
   jsonBody,
@@ -12,6 +13,7 @@ interface Task {
   title: string
   description: string | null
   stateId: string
+  organizationId: string
   createdAt: string
   updatedAt: string
 }
@@ -198,5 +200,68 @@ describe('Tasks API', () => {
       const getRes = await app.request(`/api/tasks/${created.id}`)
       expect(getRes.status).toBe(404)
     })
+  })
+})
+
+// -------------------------------------------------------
+// Cross-organization isolation
+// -------------------------------------------------------
+describe('Cross-organization isolation', () => {
+  let appOrgA: ReturnType<typeof createMultiOrgTestApps>['appOrgA']
+  let appOrgB: ReturnType<typeof createMultiOrgTestApps>['appOrgB']
+
+  beforeEach(() => {
+    ;({ appOrgA, appOrgB } = createMultiOrgTestApps())
+  })
+
+  it('org-B の GET /api/tasks に org-A のタスクが含まれない', async () => {
+    await appOrgA.request(
+      jsonRequest('/api/tasks', { title: 'Org A task', stateId: 'ws-todo' }),
+    )
+
+    const res = await appOrgB.request('/api/tasks')
+    expect(res.status).toBe(200)
+    expect(await jsonBody<Task[]>(res)).toEqual([])
+  })
+
+  it('org-B が org-A のタスクを GET /:id で取得できない', async () => {
+    const createRes = await appOrgA.request(
+      jsonRequest('/api/tasks', { title: 'Secret', stateId: 'ws-todo' }),
+    )
+    const created = await jsonBody<Task>(createRes)
+
+    const res = await appOrgB.request(`/api/tasks/${created.id}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('org-B が org-A のタスクを PATCH で更新できない', async () => {
+    const createRes = await appOrgA.request(
+      jsonRequest('/api/tasks', { title: 'Original', stateId: 'ws-todo' }),
+    )
+    const created = await jsonBody<Task>(createRes)
+
+    const res = await appOrgB.request(
+      jsonPatchRequest(`/api/tasks/${created.id}`, { title: 'Hacked' }),
+    )
+    expect(res.status).toBe(404)
+
+    // org-A 側で未変更を確認
+    const verify = await appOrgA.request(`/api/tasks/${created.id}`)
+    const task = await jsonBody<Task>(verify)
+    expect(task.title).toBe('Original')
+  })
+
+  it('org-B が org-A のタスクを DELETE で削除できない', async () => {
+    const createRes = await appOrgA.request(
+      jsonRequest('/api/tasks', { title: 'Protected', stateId: 'ws-todo' }),
+    )
+    const created = await jsonBody<Task>(createRes)
+
+    const res = await appOrgB.request(deleteRequest(`/api/tasks/${created.id}`))
+    expect(res.status).toBe(404)
+
+    // org-A 側で存在を確認
+    const verify = await appOrgA.request(`/api/tasks/${created.id}`)
+    expect(verify.status).toBe(200)
   })
 })

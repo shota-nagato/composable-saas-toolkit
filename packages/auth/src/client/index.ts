@@ -1,3 +1,4 @@
+import { organizationClient } from 'better-auth/client/plugins'
 import { createAuthClient as createBetterAuthClient } from 'better-auth/react'
 import { BASE_PATH } from '../constants'
 
@@ -13,5 +14,6 @@ export const createAuthClient = ({ baseURL }: AuthClientConfig) => {
     baseURL,
     basePath: BASE_PATH,
     fetchOptions: { credentials: 'include' },
+    plugins: [organizationClient()],
   })
 }

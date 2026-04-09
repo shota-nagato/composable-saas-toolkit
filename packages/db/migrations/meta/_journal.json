@@ -43,6 +43,13 @@
       "when": 1774864642095,
       "tag": "20260330095722_add_tasks_state_id_index",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1775744937939,
+      "tag": "20260409142857_add-organization-tables",
+      "breakpoints": true
     }
   ]
 }

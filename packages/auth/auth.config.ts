@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { admin } from 'better-auth/plugins'
+import { admin, organization } from 'better-auth/plugins'
 
 /**
  * スキーマ生成専用の設定
@@ -11,6 +11,6 @@ import { admin } from 'better-auth/plugins'
 export const auth = betterAuth({
   basePath: '/api/auth',
   emailAndPassword: { enabled: true },
-  plugins: [admin()],
+  plugins: [admin(), organization()],
   database: drizzleAdapter({} as any, { provider: 'sqlite', usePlural: true }),
 })

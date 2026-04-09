@@ -1,4 +1,4 @@
-import { authMiddleware } from '@toolkit/auth/middleware'
+import { authMiddleware, orgGuardMiddleware } from '@toolkit/auth/middleware'
 import { createAuth } from '@toolkit/auth/server'
 import { singleTenantMiddleware } from '@toolkit/tenant'
 import { cors } from 'hono/cors'
@@ -66,6 +66,7 @@ app.on(['GET', 'POST'], '/api/auth/**', async (c) => {
 
 // 認証が必要なルート
 app.use('/api/tasks/*', authMiddleware())
+app.use('/api/tasks/*', orgGuardMiddleware())
 app.use('/api/workflow-states/*', authMiddleware())
 
 app.onError((err, c) => {

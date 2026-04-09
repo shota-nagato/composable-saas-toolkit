@@ -6,6 +6,7 @@ import {
   sqliteTable,
   text,
 } from 'drizzle-orm/sqlite-core'
+import { organizations } from './auth'
 import { commonColumns } from './common'
 
 /**
@@ -67,9 +68,13 @@ export const tasks = sqliteTable(
     priority: text('priority', { enum: taskPriorityValues })
       .notNull()
       .default('no_priority'),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'cascade' }),
   },
   (table) => [
     index('tasks_state_id_idx').on(table.stateId),
+    index('tasks_organization_id_idx').on(table.organizationId),
     check(
       'priority_check',
       sql`${table.priority} IN (${sqlInList(taskPriorityValues)})`,
