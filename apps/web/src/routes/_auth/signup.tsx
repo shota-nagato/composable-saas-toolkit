@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { getAuthErrorMessage } from '@toolkit/auth'
 import { Button, Input, Label } from '@toolkit/ui'
 import { useState } from 'react'
@@ -9,6 +9,7 @@ export const Route = createFileRoute('/_auth/signup')({
 })
 
 function SignupPage() {
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -32,7 +33,7 @@ function SignupPage() {
       return
     }
 
-    window.location.href = '/'
+    navigate({ to: '/' })
   }
 
   return (

@@ -49,6 +49,16 @@ const app = factory
     const id = c.req.param('id')
     const body = c.req.valid('json')
 
+    if (body.stateId) {
+      const [state] = await db
+        .select()
+        .from(workflowStates)
+        .where(eq(workflowStates.id, body.stateId))
+      if (!state) {
+        throw new HTTPException(400, { message: 'Invalid stateId' })
+      }
+    }
+
     await db.update(tasks).set(body).where(eq(tasks.id, id))
 
     const [updated] = await db.select().from(tasks).where(eq(tasks.id, id))
