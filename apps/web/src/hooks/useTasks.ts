@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@toolkit/ui'
-import { DetailedError, parseResponse } from 'hono/client'
+import { parseResponse } from 'hono/client'
 import { type CreateTaskInput, client, type UpdateTaskInput } from '../lib/api'
+import { useApiErrorHandler } from './useApiErrorHandler'
 
 export const taskKeys = {
   all: ['tasks'] as const,
@@ -26,6 +27,7 @@ export function useTask(id: string) {
 export function useCreateTask() {
   const qc = useQueryClient()
   const { toast } = useToast()
+  const onError = useApiErrorHandler()
   return useMutation({
     mutationFn: async (input: CreateTaskInput) =>
       parseResponse(client.api.tasks.$post({ json: input })),
@@ -33,13 +35,13 @@ export function useCreateTask() {
       qc.invalidateQueries({ queryKey: taskKeys.all })
       toast('Task created', 'success')
     },
-    onError: (error) => handleMutationError(error, toast),
+    onError,
   })
 }
 
 export function useUpdateTask() {
   const qc = useQueryClient()
-  const { toast } = useToast()
+  const onError = useApiErrorHandler()
   return useMutation({
     mutationFn: ({ id, ...input }: { id: string } & UpdateTaskInput) =>
       parseResponse(
@@ -49,13 +51,14 @@ export function useUpdateTask() {
       qc.invalidateQueries({ queryKey: taskKeys.all })
       qc.invalidateQueries({ queryKey: taskKeys.detail(id) })
     },
-    onError: (error) => handleMutationError(error, toast),
+    onError,
   })
 }
 
 export function useDeleteTask() {
   const qc = useQueryClient()
   const { toast } = useToast()
+  const onError = useApiErrorHandler()
   return useMutation({
     mutationFn: async (id: string) => {
       await parseResponse(client.api.tasks[':id'].$delete({ param: { id } }))
@@ -65,22 +68,6 @@ export function useDeleteTask() {
       qc.removeQueries({ queryKey: taskKeys.detail(id) })
       toast('Task deleted')
     },
-    onError: (error) => handleMutationError(error, toast),
+    onError,
   })
-}
-
-function handleMutationError(
-  error: Error,
-  toast: (
-    message: string,
-    variant?: 'default' | 'success' | 'destructive',
-  ) => void,
-) {
-  if (error instanceof DetailedError) {
-    console.error(`[API ${error.statusCode}]`, error.message, error.detail)
-    toast(error.message || 'An error occurred', 'destructive')
-    return
-  }
-  console.error('[API]', error.message)
-  toast('An error occurred', 'destructive')
 }
