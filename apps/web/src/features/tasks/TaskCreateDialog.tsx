@@ -60,12 +60,11 @@ export function TaskCreateDialog({
   const titleRegister = register('title')
 
   // inert を解除して Tiptap を操作可能にする（title にフォーカス後）
+  // close 時のリセットは handleOpenChange 側で行う
   useEffect(() => {
-    if (open) {
-      setEditorInert(true)
-      const timer = setTimeout(() => setEditorInert(false), 150)
-      return () => clearTimeout(timer)
-    }
+    if (!open) return
+    const timer = setTimeout(() => setEditorInert(false), 150)
+    return () => clearTimeout(timer)
   }, [open])
 
   useEffect(() => {
