@@ -3,13 +3,21 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./middleware": "./src/middleware.ts",
+    "./resolver": "./src/resolver.ts",
     "./types": "./src/types.ts"
   },
   "dependencies": {
     "@toolkit/db": "workspace:*",
     "hono": "catalog:"
+  },
+  "devDependencies": {
+    "vitest": "catalog:"
   }
 }
