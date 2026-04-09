@@ -6,7 +6,9 @@
   "scripts": {
     "db:migrate": "drizzle-kit migrate",
     "db:generate": "drizzle-kit generate",
-    "seed": "tsx seed/index.ts"
+    "seed": "tsx seed/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -18,8 +20,12 @@
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "catalog:",
+    "@types/node": "catalog:",
+    "better-sqlite3": "catalog:",
     "dotenv": "catalog:",
     "drizzle-kit": "catalog:",
-    "tsx": "catalog:"
+    "tsx": "catalog:",
+    "vitest": "catalog:"
   }
 }
